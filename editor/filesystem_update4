@@ -1,0 +1,12 @@
+res://Levels/trial_level.tscn
+res://Weapons/green_magic_staff.gd
+res://Enemies/Enemy.tscn
+res://Player/Player.tscn
+res://Weapons/Weapon.tscn
+res://Weapons/Sword.tscn
+res://Enemies/Red_monster.tscn
+res://Player/HP_bar.tscn
+res://Weapons/Axe.tscn
+res://Weapons/green_magic_staff.tscn
+res://Weapons/Bullet.tscn
+res://Weapons/Bullet.gd

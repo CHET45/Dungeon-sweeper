@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3 uid="uid://kioyo7ql75rd"]
+
+[ext_resource type="Script" path="res://Enemies/Enemies.gd" id="1_vlrhh"]
+
+[node name="Enemy" type="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
+collision_layer = 4
+collision_mask = 61
+script = ExtResource("1_vlrhh")
+
+[node name="animation" type="Sprite2D" parent="."]
+position = Vector2(0, -26)
+region_rect = Rect2(0, 0, 128, 128)
+
+[node name="Timer" type="Timer" parent="animation"]
+wait_time = 0.14
+
+[node name="atack_timer" type="Timer" parent="animation"]
+
+[node name="Cillision_for_everything" type="CollisionShape2D" parent="."]
+
+[node name="Release_damage" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 59
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Release_damage"]
+
+[node name="HP" type="ProgressBar" parent="."]
+offset_left = -40.0
+offset_top = -56.0
+offset_right = 48.0
+offset_bottom = -29.0
+
+[node name="Damage_cooldown" type="Timer" parent="."]
+
+[node name="Take_damage" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 63
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Take_damage"]
+
+[node name="Collision_for_enemies" type="CharacterBody2D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="Collision" type="CollisionShape2D" parent="Collision_for_enemies"]
+
+[connection signal="timeout" from="Damage_cooldown" to="." method="Damage_cooldown_timeout"]

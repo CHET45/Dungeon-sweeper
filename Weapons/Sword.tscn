@@ -1,0 +1,28 @@
+[gd_scene load_steps=6 format=3 uid="uid://n7b30cpxy2x4"]
+
+[ext_resource type="Script" path="res://Weapons/Sword.gd" id="1_fa8sd"]
+[ext_resource type="Texture2D" uid="uid://dm68tuxrqvjix" path="res://Tiles/Tile_set_fin.png" id="1_gwmej"]
+[ext_resource type="PackedScene" uid="uid://datvmhbg4bb7m" path="res://Weapons/Weapon.tscn" id="1_u58qy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gwiao"]
+atlas = ExtResource("1_gwmej")
+region = Rect2(896, 0, 20, 42)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6ue88"]
+size = Vector2(16, 26)
+
+[node name="Sword" instance=ExtResource("1_u58qy")]
+position = Vector2(212, 114)
+script = ExtResource("1_fa8sd")
+damage = 5
+atk_speed = 20
+
+[node name="Weapon_sprite" parent="." index="0"]
+position = Vector2(0, -10.3)
+texture = SubResource("AtlasTexture_gwiao")
+
+[node name="CollisionShape2D" parent="Weapon_area" index="0"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_6ue88")
+
+[connection signal="body_entered" from="Weapon_area" to="." method="body_entered"]
