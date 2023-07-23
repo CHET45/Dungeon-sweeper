@@ -1,7 +1,0 @@
-[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://ctj3808fx5tc"]
-
-[ext_resource type="Texture2D" uid="uid://bko5cdni6is80" path="res://Tiles/Red_monstr_anim.png" id="1_xaeuw"]
-
-[resource]
-atlas = ExtResource("1_xaeuw")
-region = Rect2(0, 0, 1024, 128)

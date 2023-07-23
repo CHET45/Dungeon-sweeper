@@ -1,8 +1,0 @@
-[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://wk58j1projls"]
-
-[ext_resource type="Texture2D" uid="uid://ca3d0ssjb4v4w" path="res://Tiles/Man_anim.png" id="1_od7bk"]
-
-[resource]
-resource_name = "Kolja"
-atlas = ExtResource("1_od7bk")
-region = Rect2(0, 0, 288, 32)
