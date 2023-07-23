@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://bp0g4bevbnk0r"]
+
+[ext_resource type="Texture2D" uid="uid://dmtakxyecbw08" path="res://Tiles/DALL_E_2023-06-28_15.51.21_-_пиксель_арт_Энергетическая_сфера_зелёного_цвета_с_большим_количеством_маленьких_деталек_для_2д_игры_-removebg-preview.png" id="1_1yr5v"]
+[ext_resource type="Script" path="res://Weapons/Bullet.gd" id="1_s4auq"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ec4q5"]
+radius = 11.0454
+
+[node name="Bullet" type="Area2D"]
+position = Vector2(37, 36)
+script = ExtResource("1_s4auq")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_1yr5v")
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ec4q5")
+metadata/_edit_lock_ = true
+
+[connection signal="body_entered" from="." to="." method="body_entered"]

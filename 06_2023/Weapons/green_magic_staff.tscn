@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://by8kwv1yio10c"]
+
+[ext_resource type="PackedScene" uid="uid://datvmhbg4bb7m" path="res://Weapons/Weapon.tscn" id="1_8dg0n"]
+[ext_resource type="Script" path="res://Weapons/green_magic_staff.gd" id="2_tkg18"]
+[ext_resource type="Texture2D" uid="uid://dt1aytbou6rw4" path="res://Tiles/Tile_set.tres" id="2_wp37t"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ne7wf"]
+size = Vector2(60, 16)
+
+[node name="Green_magic_staff" instance=ExtResource("1_8dg0n")]
+position = Vector2(243, 192)
+rotation = -1.5708
+script = ExtResource("2_tkg18")
+metadata/_edit_vertical_guides_ = [187.0]
+
+[node name="Weapon_sprite" parent="." index="0"]
+rotation = 1.5708
+texture = ExtResource("2_wp37t")
+offset = Vector2(0, -10)
+metadata/_edit_lock_ = true
+
+[node name="Weapon_area" parent="." index="1"]
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" parent="Weapon_area" index="0"]
+position = Vector2(10, 7.62939e-05)
+shape = SubResource("RectangleShape2D_ne7wf")
+
+[node name="Aim" type="Marker2D" parent="." index="2"]
+position = Vector2(40, 0)
+
+[connection signal="body_entered" from="Weapon_area" to="." method="body_entered"]

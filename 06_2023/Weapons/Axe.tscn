@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://ceym54db6hvkw"]
+
+[ext_resource type="PackedScene" uid="uid://datvmhbg4bb7m" path="res://Weapons/Weapon.tscn" id="1_e8rjw"]
+[ext_resource type="Script" path="res://Weapons/Axe.gd" id="2_pgc8t"]
+[ext_resource type="Texture2D" uid="uid://boiklo564p5w5" path="res://Tiles/Tile_set_final.png" id="3_m7t4e"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y805u"]
+atlas = ExtResource("3_m7t4e")
+region = Rect2(384, 45, 42, 19)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gpb48"]
+size = Vector2(17, 38)
+
+[node name="Axe" instance=ExtResource("1_e8rjw")]
+position = Vector2(287, 161)
+script = ExtResource("2_pgc8t")
+damage = 15
+atk_speed = 20
+
+[node name="Weapon_sprite" parent="." index="0"]
+rotation = 1.5708
+texture = SubResource("AtlasTexture_y805u")
+offset = Vector2(-10, -4)
+
+[node name="Weapon_area" parent="." index="1"]
+position = Vector2(4, -10)
+collision_layer = 64
+
+[node name="CollisionShape2D" parent="Weapon_area" index="0"]
+shape = SubResource("RectangleShape2D_gpb48")
+
+[connection signal="body_entered" from="Weapon_area" to="." method="body_entered"]

@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://cupr0xiher71q"]
+
+[ext_resource type="Texture2D" uid="uid://ca3d0ssjb4v4w" path="res://Tiles/Man_anim.png" id="1_lhc5b"]
+
+[resource]
+atlas = ExtResource("1_lhc5b")
+region = Rect2(0, 0, 32, 32)

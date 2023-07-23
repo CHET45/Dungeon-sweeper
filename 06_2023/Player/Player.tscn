@@ -1,0 +1,98 @@
+[gd_scene load_steps=8 format=3 uid="uid://bd62bito1jy2a"]
+
+[ext_resource type="Script" path="res://Player/player.gd" id="1_5ktv0"]
+[ext_resource type="Texture2D" uid="uid://wk58j1projls" path="res://Tiles/Man_animation.tres" id="2_kx4pk"]
+[ext_resource type="Script" path="res://Player/Man_anmation.gd" id="3_6035o"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5fqnq"]
+size = Vector2(20, 30)
+
+[sub_resource type="Animation" id="Animation_p2b3o"]
+resource_name = "Damaged"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Man:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0, 0, 0, 1), Color(1, 1, 1, 1), Color(0, 0, 0, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_oaooh"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = false
+tracks/0/path = NodePath("Man:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
+"update": 0,
+"values": []
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Man:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [5]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_op0a5"]
+_data = {
+"Damaged": SubResource("Animation_p2b3o"),
+"RESET": SubResource("Animation_oaooh")
+}
+
+[node name="Player" type="CharacterBody2D"]
+light_mask = 2
+visibility_layer = 61
+collision_layer = 66
+collision_mask = 57
+script = ExtResource("1_5ktv0")
+speed = 150
+max_health = 10
+
+[node name="Man" type="Sprite2D" parent="."]
+texture = ExtResource("2_kx4pk")
+hframes = 9
+frame = 5
+region_rect = Rect2(128, 0, 32, 32)
+script = ExtResource("3_6035o")
+metadata/_edit_lock_ = true
+
+[node name="Timer" type="Timer" parent="Man"]
+wait_time = 0.1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 2
+shape = SubResource("RectangleShape2D_5fqnq")
+metadata/_edit_lock_ = true
+
+[node name="Damage_cooldown" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_op0a5")
+}
+
+[node name="Weapon_place" type="Marker2D" parent="."]
+position = Vector2(9, 5)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[connection signal="timeout" from="Man/Timer" to="Man" method="Man_animation"]
+[connection signal="timeout" from="Damage_cooldown" to="." method="damage_cooldown_timeout"]
