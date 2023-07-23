@@ -24,6 +24,7 @@ offset = Vector2(-10, -4)
 
 [node name="Weapon_area" parent="." index="1"]
 position = Vector2(4, -10)
+collision_layer = 64
 
 [node name="CollisionShape2D" parent="Weapon_area" index="0"]
 shape = SubResource("RectangleShape2D_gpb48")

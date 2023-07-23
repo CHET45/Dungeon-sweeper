@@ -4,6 +4,7 @@ extends CharacterBody2D
 @export var max_health:int
 @export var damage:int
 @onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
+var next_path_position: Vector2
 var in_motion=false
 var motion_flag=true
 var damaged=false
@@ -14,6 +15,7 @@ var RGB_flag=true
 @export var atack_flag=true
 var damage_player=true
 signal hit_player
+@export var see_player=false
 func _ready():
 	health=max_health
 	$HP.max_value=max_health
@@ -32,12 +34,15 @@ func actor_setup():
 func set_movement_target(target_to_move: Vector2):
 	navigation_agent.target_position = target_to_move
 
-func _physics_process(_delta):	
+func _process(_delta):	
 	if health>0:
+		if see_player:
+			set_movement_target(get_parent().get_node("Player").global_position)
+		else:
+			set_movement_target(position)
 		$HP.value=health
-		set_movement_target(get_parent().get_node("Player").global_position)
 		var current_agent_position: Vector2 = global_position
-		var next_path_position: Vector2 = navigation_agent.get_next_path_position()
+		next_path_position= navigation_agent.get_next_path_position()
 	
 		var new_velocity: Vector2 = next_path_position - current_agent_position
 		new_velocity = new_velocity.normalized()
@@ -62,6 +67,7 @@ func _physics_process(_delta):
 		if in_motion and motion_flag:
 			motion_flag=false
 			$animation.enemy_animation()
+		
 	else:
 		queue_free()
 
@@ -100,3 +106,14 @@ func Damage_animation():
 		RGB-=1
 	else:
 		RGB_flag=true
+
+
+func _on_player_radar_body_entered(body):
+	if body.name=="Player":
+		see_player=true
+		$Player_radar/CollisionShape2D.scale*=3.5
+
+func _on_player_radar_body_exited(body):
+	if body.name=="Player":
+		$Player_radar/CollisionShape2D.scale/=3.5
+		see_player=false

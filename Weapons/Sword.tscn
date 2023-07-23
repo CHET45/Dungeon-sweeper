@@ -15,11 +15,14 @@ size = Vector2(16, 26)
 position = Vector2(212, 114)
 script = ExtResource("1_fa8sd")
 damage = 5
-atk_speed = 20
+atk_speed = 20.0
 
 [node name="Weapon_sprite" parent="." index="0"]
 position = Vector2(0, -10.3)
 texture = SubResource("AtlasTexture_gwiao")
+
+[node name="Weapon_area" parent="." index="1"]
+collision_layer = 64
 
 [node name="CollisionShape2D" parent="Weapon_area" index="0"]
 position = Vector2(0, -18)

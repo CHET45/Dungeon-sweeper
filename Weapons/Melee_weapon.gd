@@ -17,7 +17,6 @@ func _process(_delta):
 
 func body_entered(body):
 	if body.name=="Player":
-		
 		emit_signal("Player_entered",weapon_scene.instantiate(), $Weapon_sprite)
 		emit_signal("delete_weapon_from_scene",weapon_path)
 		#$Weapon_area.set_collision_mask_value(3,true)

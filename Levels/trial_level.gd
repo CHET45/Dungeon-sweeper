@@ -61,3 +61,13 @@ func add_weapon_to_weapon_stock(weapon_texture):
 	child_number=weapon_list_obj.get_child_count()-1
 	child = weapon_list_obj.get_child(child_number)
 	child.button_number=child_number
+
+
+func shoot(bullet):
+	add_child(bullet)
+
+
+func weapon_button_pressed(_weapon_index):
+	#chtobi menjalos pri nazatii na knopku
+	#child_number=weapon_index
+	pass

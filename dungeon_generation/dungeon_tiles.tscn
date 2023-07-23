@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://chhtlwak6lewj"]
+
+[ext_resource type="Texture2D" uid="uid://d3wf1aw0illi4" path="res://Tiles/Floor_tile.png" id="1_d12vl"]
+[ext_resource type="Texture2D" uid="uid://cwwmte2sv0wph" path="res://Tiles/Dor_tile.png" id="2_i4413"]
+[ext_resource type="Texture2D" uid="uid://bscpbpw3rmvyp" path="res://Tiles/Border_tile.png" id="3_ft5h1"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_xwidl"]
+_surfaces = [{
+"2d": true,
+"aabb": AABB(-16, -16, 0, 32, 32, 0),
+"attribute_data": PackedByteArray(0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0),
+"format": 33558545,
+"index_count": 6,
+"index_data": PackedByteArray(3, 0, 0, 0, 1, 0, 1, 0, 2, 0, 3, 0),
+"primitive": 3,
+"vertex_count": 4,
+"vertex_data": PackedByteArray(0, 0, 128, 65, 0, 0, 128, 65, 0, 0, 128, 193, 0, 0, 128, 65, 0, 0, 128, 193, 0, 0, 128, 193, 0, 0, 128, 65, 0, 0, 128, 193)
+}]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="RoomTile" type="MeshInstance2D" parent="."]
+mesh = SubResource("ArrayMesh_xwidl")
+
+[node name="HallwayTile" type="MeshInstance2D" parent="."]
+position = Vector2(38, 0)
+mesh = SubResource("ArrayMesh_xwidl")
+texture = ExtResource("1_d12vl")
+
+[node name="DorTile" type="MeshInstance2D" parent="."]
+position = Vector2(74, 0)
+mesh = SubResource("ArrayMesh_xwidl")
+texture = ExtResource("2_i4413")
+
+[node name="BorderTile" type="MeshInstance2D" parent="."]
+position = Vector2(112, 0)
+mesh = SubResource("ArrayMesh_xwidl")
+texture = ExtResource("3_ft5h1")

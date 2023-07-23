@@ -34,23 +34,16 @@ func _process(delta):
 		move_and_slide()
 		simple_motion_animation()
 			
-	if Input.is_action_pressed("Atack") and weapon and weapon.animation==false:
+	if Input.is_action_just_pressed("Atack") and weapon and weapon.animation==false:
 		weapon.call("weapon_animation")
+		#if weapon.has_method("shoort"):
+		#	weapon.call("shoort")
 		can_flip_h=false
 	elif	weapon and weapon.animation==false:
 		can_flip_h=true
 	if weapon :
 		weapon.flip=$Man.flip_h
 		weapon.position=$Weapon_place.position
-	if Input.is_action_just_pressed("Change_weapon") and weapon and weapon.animation==false:
-		#weapon.hide()
-		#weapon=get_child(which_weapon)
-		#weapon.visible=true
-		#if which_weapon<weapon_count:
-		#	which_weapon+=1
-		#else:
-		#	which_weapon=0 
-		pass
 	
 func simple_motion_animation():
 	if Input.is_action_pressed("down") or Input.is_action_pressed("up") or Input.is_action_pressed("left") or Input.is_action_pressed("right"):
@@ -95,8 +88,15 @@ func Player_entered_deferred(weapon_instance,weapon_texture):
 	weapon.flip=$Man.flip_h
 	weapon.position=$Weapon_place.position
 	
-
 func weapon_button_pressed(weapon_index):
 	weapon.hide()
 	weapon=get_child(weapon_index)
 	weapon.visible=true
+
+func Restore_hp(HP):
+	if health+HP<max_health:
+		health+=HP
+		emit_signal("health_change",-HP)
+	elif health+HP>=max_health:		
+		emit_signal("health_change",-(max_health-health))
+		health=max_health

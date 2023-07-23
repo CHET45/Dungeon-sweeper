@@ -4,9 +4,16 @@
 
 [node name="Enemy" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
+disable_mode = 2
 collision_layer = 4
 collision_mask = 61
 script = ExtResource("1_vlrhh")
+
+[node name="Collision_for_enemies" type="CharacterBody2D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="Collision" type="CollisionShape2D" parent="Collision_for_enemies"]
 
 [node name="animation" type="Sprite2D" parent="."]
 position = Vector2(0, -26)
@@ -26,6 +33,7 @@ collision_mask = 59
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Release_damage"]
 
 [node name="HP" type="ProgressBar" parent="."]
+visible = false
 offset_left = -40.0
 offset_top = -56.0
 offset_right = 48.0
@@ -39,10 +47,12 @@ collision_mask = 63
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Take_damage"]
 
-[node name="Collision_for_enemies" type="CharacterBody2D" parent="."]
-collision_layer = 128
-collision_mask = 128
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 
-[node name="Collision" type="CollisionShape2D" parent="Collision_for_enemies"]
+[node name="Player_radar" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player_radar"]
 
 [connection signal="timeout" from="Damage_cooldown" to="." method="Damage_cooldown_timeout"]
+[connection signal="body_entered" from="Player_radar" to="." method="_on_player_radar_body_entered"]
+[connection signal="body_exited" from="Player_radar" to="." method="_on_player_radar_body_exited"]
