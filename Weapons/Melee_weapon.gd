@@ -1,5 +1,5 @@
 extends Node2D
-@export var weapon_scene:PackedScene
+@export var weapon_node:Node2D
 @export var damage:int
 @export var atk_speed:float
 @export var weapon_path:String
@@ -17,10 +17,10 @@ func _process(_delta):
 
 func body_entered(body):
 	if body.name=="Player":
-		emit_signal("Player_entered",weapon_scene.instantiate(), $Weapon_sprite)
+		print("Player entered")
+		body.call("Player_entered",get_node(".").duplicate(6), $Weapon_sprite)
 		emit_signal("delete_weapon_from_scene",weapon_path)
-		#$Weapon_area.set_collision_mask_value(3,true)
 		
 func weapon_animation():
 	animation=true
-	$Weapon_area.set_collision_layer_value(5,true)
+	$Weapon_area.set_collision_layer_value(7,true)

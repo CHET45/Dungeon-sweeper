@@ -102,7 +102,7 @@ doors_updown={
 2d_physics/layer_4="Bullets"
 2d_physics/layer_5="Usable_items"
 2d_physics/layer_6="Destoyable_items"
-2d_physics/layer_7="Player&Weapons"
+2d_physics/layer_7="Weapons"
 2d_physics/layer_8="Enemies&Enemies"
 
 [rendering]

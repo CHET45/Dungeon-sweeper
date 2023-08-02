@@ -3,7 +3,7 @@ var rotation_direction=1
 var animation_part=1
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	weapon_scene=load("res://Weapons/Sword.tscn")
+	#weapon_node=get_node(".")
 	weapon_path=get_path()
 	#$Weapon_sprite.texture=$Weapon_sprite
 
@@ -14,7 +14,6 @@ func _process(_delta):
 		if animation_part==1:
 			animation_part=2
 			atk_speed=-atk_speed/3.5
-		print("tru345e")
 		rotation_degrees+=atk_speed*rotation_direction
 	if flip:
 		rotation_direction=-1
@@ -30,6 +29,6 @@ func _process(_delta):
 	if rotation_direction*rotation_degrees<=0 and animation_part==3:
 		rotation_degrees=0*rotation_direction
 		animation=false
-		$Weapon_area.set_collision_layer_value(5,false)
+		$Weapon_area.set_collision_layer_value(7,false)
 		atk_speed=-atk_speed
 		animation_part=1

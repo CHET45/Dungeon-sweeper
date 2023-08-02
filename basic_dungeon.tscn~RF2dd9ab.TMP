@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dlmgsvejs44cg"]
+[gd_scene load_steps=11 format=3 uid="uid://bwx4out4rjmop"]
 
 [ext_resource type="Script" path="res://basic_dungeon.gd" id="1_u8wh8"]
 [ext_resource type="TileSet" uid="uid://bns40f1vo75ri" path="res://Tiles/Tile_set_all.tres" id="2_mhx1m"]
@@ -96,7 +96,7 @@ icon_alignment = 1
 script = ExtResource("4_l1j11")
 
 [node name="Player" parent="." instance=ExtResource("3_n7bl2")]
-position = Vector2(89, -87)
+position = Vector2(-223, -167)
 
 [node name="Sword" parent="." instance=ExtResource("6_jsvfp")]
 position = Vector2(-232, -162)

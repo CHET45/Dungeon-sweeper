@@ -4,7 +4,7 @@ var animation_part=1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	weapon_scene=load("res://Weapons/Axe.tscn")
+	#weapon_node=get_node(".")
 	weapon_path=get_path()
 
 
@@ -29,7 +29,7 @@ func _process(_delta):
 	if rotation_direction*rotation_degrees>=120:
 		atk_speed=-atk_speed/2.5
 		animation_part=3
-		$Weapon_area.set_collision_layer_value(5,false)
+		$Weapon_area.set_collision_layer_value(7,false)
 	if rotation_direction*rotation_degrees<=0 and animation_part==3:
 		animation_part=1
 		animation=false

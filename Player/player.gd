@@ -8,6 +8,7 @@ var motion_flag=true
 var damaged=false
 var damage_cooldown_flag=true
 var weapon:Node2D
+var weapons={}
 var weapon_count=-1
 @export var can_flip_h=true
 
@@ -82,15 +83,16 @@ func Player_entered_deferred(weapon_instance,weapon_texture):
 		weapon.hide()
 	weapon_count+=1
 	add_child(weapon_instance)
-	move_child(weapon_instance,weapon_count)
-	weapon=get_child(weapon_count)
+	weapons[weapon_count]=weapon_instance
+	weapon=weapon_instance
+	print("weapon added to player")
 	emit_signal("add_weapon_to_weapon_stock",weapon_texture)
 	weapon.flip=$Man.flip_h
 	weapon.position=$Weapon_place.position
 	
 func weapon_button_pressed(weapon_index):
 	weapon.hide()
-	weapon=get_child(weapon_index)
+	weapon=weapons.get(weapon_index)
 	weapon.visible=true
 
 func Restore_hp(HP):
@@ -100,3 +102,6 @@ func Restore_hp(HP):
 	elif health+HP>=max_health:		
 		emit_signal("health_change",-(max_health-health))
 		health=max_health
+
+func has_weapon(new_weapon:Node2D):
+	return weapons.has(new_weapon)

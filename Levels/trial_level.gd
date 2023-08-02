@@ -61,6 +61,7 @@ func add_weapon_to_weapon_stock(weapon_texture):
 	child_number=weapon_list_obj.get_child_count()-1
 	child = weapon_list_obj.get_child(child_number)
 	child.button_number=child_number
+	print("weapont added to weapon stock")
 
 
 func shoot(bullet):

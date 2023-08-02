@@ -6,7 +6,7 @@ signal shoot
 var bullet_instace
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	weapon_scene=load("res://Weapons/green_magic_staff.tscn")
+	#weapon_scene=load("res://Weapons/green_magic_staff.tscn")
 	weapon_path=get_path()
 	
 

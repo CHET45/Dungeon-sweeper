@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bn6vhysq7qdjl"]
+[gd_scene load_steps=9 format=3 uid="uid://cglkt5fttl6id"]
 
 [ext_resource type="Texture2D" uid="uid://ctj3808fx5tc" path="res://Tiles/Red_monstr_animation.tres" id="1_0w0l3"]
 [ext_resource type="PackedScene" uid="uid://kioyo7ql75rd" path="res://Enemies/Enemy.tscn" id="1_4jpx8"]
@@ -19,9 +19,6 @@ height = 160.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34slc"]
 radius = 50.0
 height = 124.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_lcx3k"]
-radius = 1066.01
 
 [node name="Red_monster" instance=ExtResource("1_4jpx8")]
 collision_mask = 60
@@ -69,10 +66,9 @@ debug_enabled = true
 
 [node name="Player_radar" parent="." index="8"]
 collision_layer = 4
-collision_mask = 66
 
 [node name="CollisionShape2D" parent="Player_radar" index="0"]
-shape = SubResource("CircleShape2D_lcx3k")
+position = Vector2(8, 0)
 
 [connection signal="timeout" from="animation/Timer" to="animation" method="enemy_animation"]
 [connection signal="timeout" from="animation/atack_timer" to="animation" method="enemy_atack_animation"]

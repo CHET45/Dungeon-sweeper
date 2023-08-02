@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Levels/trial_level.gd" id="1_y78yo"]
 [ext_resource type="TileSet" uid="uid://bns40f1vo75ri" path="res://Tiles/Tile_set_all.tres" id="2_c11c0"]
 [ext_resource type="PackedScene" uid="uid://bd62bito1jy2a" path="res://Player/Player.tscn" id="2_du240"]
-[ext_resource type="PackedScene" uid="uid://bn6vhysq7qdjl" path="res://Enemies/Red_monster.tscn" id="3_20m28"]
+[ext_resource type="PackedScene" uid="uid://cglkt5fttl6id" path="res://Enemies/Red_monster.tscn" id="3_20m28"]
 [ext_resource type="PackedScene" uid="uid://n7b30cpxy2x4" path="res://Weapons/Sword.tscn" id="7_aibb4"]
 [ext_resource type="PackedScene" uid="uid://bqvd8oornsh3j" path="res://Player/HP_bar.tscn" id="7_m840l"]
 [ext_resource type="PackedScene" uid="uid://ceym54db6hvkw" path="res://Weapons/Axe.tscn" id="8_ce25j"]

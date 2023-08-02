@@ -43,13 +43,16 @@ offset_bottom = -29.0
 
 [node name="Take_damage" type="Area2D" parent="."]
 collision_layer = 4
-collision_mask = 63
+collision_mask = 64
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Take_damage"]
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 
 [node name="Player_radar" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 66
+monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player_radar"]
 
