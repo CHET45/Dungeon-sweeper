@@ -1,9 +1,11 @@
 extends Node2D
 
 
-@export var level_size = Vector2(100, 100)
-@export var rooms_size = Vector2(15, 25)
-@export var rooms_max = 7
+@export var level_size = Vector2(150, 150)
+@export var rooms_size = Vector2(35, 40)
+@export var rooms_max = 10
+@export var corridor_size=3
+var total_level_area:float
 var data = {}
 var children=[]
 var rooms=[]
@@ -18,6 +20,8 @@ var child
 var child_number
 
 func _ready():
+	
+	total_level_area=level_size.x-4*level_size.y-4
 	_setup_camera()
 	weapon_list_obj=weapon_stock_obj.get_node("Weapon_list/Container")
 	$CanvasLayer.visible=true
@@ -32,9 +36,7 @@ func _process(_delta):
 	if Input.is_action_just_pressed("re_generate"):
 		call_deferred("_generate")
 	if Input.is_action_just_pressed("doors_updown"):
-		#get_tree().paused=true
 		_change_dors_mode()
-		#get_tree().paused=false
 	if Input.is_action_just_pressed("Change_weapon") and change_weapon_flag:
 		weapon_stock_obj.visible=true
 		change_weapon_flag=false
@@ -60,18 +62,19 @@ func _setup_camera() :
 	camera.zoom = Vector2(z, z)
 
 func _generate():
-	rooms = []
 	var rng = RandomNumberGenerator.new()
-	while rooms.size()<6:
-		for child_enemy in children:
-			child_enemy.queue_free()
-		$Player.position=Vector2(0,0)
-		level.clear()
-		data={}
-		children=[]
-		rooms = []
-		dors=[]
-		_generate_data(rng)
+	for child_enemy in children:
+		child_enemy.queue_free()
+	$Player.position=Vector2(0,0)
+	level.clear()
+	data={}
+	children=[]
+	for room in rooms:
+		remove_child(room)
+	rooms = []
+	dors=[]
+	_generate_data(rng)
+	_reduce_room_area()
 	_add_connections(rng)
 	_add_dors()
 	_fill_level()
@@ -89,27 +92,124 @@ func _fill_level():
 
 func _generate_data(rng:RandomNumberGenerator):
 	rng.randomize()
-
-	for r in range(rooms_max):
-		var room = _get_random_room(rng)
-		if _intersects(room):
-			continue
-
-		_add_room(room)
-		_add_monsters(rng,room)
+	var room:Area2D
+	while rooms.size()<7 and rooms.size()<rooms_max:
+		for r in rooms_max:
+			room = _get_random_room(rng)
+			if room:
+				rooms.push_back(room)
+				add_child(room)
+				#_add_room(room)
+				_add_monsters(rng,room)
 
 func _get_random_room(rng: RandomNumberGenerator) :
-	var width = rng.randi_range(rooms_size.x, rooms_size.y)
-	var height = rng.randi_range(rooms_size.x, rooms_size.y)
-	var x = rng.randi_range(2, level_size.x - width - 2)
-	var y = rng.randi_range(2, level_size.y - height - 2)
-	return Rect2(x, y, width, height)
+	var area=Area2D.new()
+	var col=CollisionShape2D.new()
+	area.add_child(col)
+	var shape
+	var posx:int
+	var posy:int
+	var c=32
+	var room_dic={}
+	var intersects=false
+	if rng.randi_range(0,1):
+		var y:int
+		var radius=rng.randi_range(rooms_size.x,rooms_size.y)/1.5
+		posx = rng.randi_range(1+radius, level_size.x - radius - 1)
+		posy = rng.randi_range(1+radius, level_size.y - radius - 1)
+		shape=CircleShape2D.new()
+		shape.set_radius(radius*c)
+		for xi in range(-radius,radius+1):
+			if !intersects:
+				y=round(sqrt(-xi*xi+radius*radius))
+				for yi in range(-y,y):
+					if !data.has(Vector2(xi+posx,yi+posy)):
+						room_dic[Vector2(xi+posx,yi+posy)]=1
+					else:
+						room_dic={}
+						intersects=true
+						return null
+						
+			else:
+				area.queue_free()
+				return null
+		
+	else:
+		var width = rng.randi_range(rooms_size.x, rooms_size.y)
+		var height = rng.randi_range(rooms_size.x, rooms_size.y)
+		posx = rng.randi_range(2+ceil(width/2), level_size.x - width/2 - 2)
+		posy = rng.randi_range(2+ceil(height/2), level_size.y - height/2 - 2)
+		shape=RectangleShape2D.new()
+		shape.set_size(Vector2(width,height)*c)
+		for xi in range(posx-width/2, posx+width/2):
+			if !intersects:
+				for yi in range(posy-height/2, posy+height/2):
+					if !data.has(Vector2(xi, yi)):
+						room_dic[Vector2(xi, yi)] = 1
+					else:
+						room_dic={}
+						intersects=true
+						return null
+			else:
+				area.queue_free()
+				return null
+	if room_dic:
+		col.set_shape(shape)
+		area.position=Vector2(posx,posy)*c
+		data.merge(room_dic)
+		return area
+	else:
+		return null
 
-func _add_room( room: Rect2):
-	rooms.push_back(room)
-	for x in range(room.position.x, room.end.x):
-		for y in range(room.position.y, room.end.y):
-			data[Vector2(x, y)] = 1
+func _reduce_room_area():
+	for room in rooms:
+		var posx=room.position.x/32
+		var posy=room.position.y/32
+		if room.get_child(0).get_shape().get_class()=="CircleShape2D":
+			var radius=room.get_child(0).get_shape().get_radius()/32
+			for xi in range(-radius,radius+1):
+				var y=round(sqrt(-xi*xi+radius*radius))
+				for yi in range(-y,-y+3):
+					data.erase(Vector2(xi+posx,yi+posy))
+				for yi in range(y-2,y+1):
+					data.erase(Vector2(xi+posx,yi+posy))
+			for yi in range(-radius,radius+1):
+				var x=round(sqrt(-yi*yi+radius*radius))
+				for xi in range(-x,-x+3):
+					data.erase(Vector2(xi+posx,yi+posy))
+				for xi in range(x-2,x+1):
+					data.erase(Vector2(xi+posx,yi+posy))
+		elif room.get_child(0).get_shape().get_class()=="RectangleShape2D":
+			var width=room.get_child(0).get_shape().get_size().x/32
+			var height=room.get_child(0).get_shape().get_size().y/32
+			for w in 3:
+				for xi in range(posx-width/2, posx+width/2):
+					data[Vector2(xi,posy+height/2-w)]=null
+					data[Vector2(xi,posy-height/2+w)]=null
+				for yi in range(posy-height/2, posy+height/2):
+					data[Vector2(posx+width/2-w, yi)]=null
+					data[Vector2(posx-width/2+w, yi)]=null
+
+#func _add_room( room:Area2D):
+#	rooms.push_back(room)
+#	var col:CollisionShape2D=room.get_child(0)
+#	var posx=room.position.x/32
+#	var posy=room.position.y/32
+#	if col.get_shape().get_class()=="CircleShape2D":
+#		var y:int
+#		var radius=room.get_child(0).get_shape().get_radius()/32
+#		for xi in range(-radius,radius+1):
+#			y=-sqrt(-xi*xi+radius*radius)
+#			for yi in range(y,-y):
+#				data[Vector2(xi+posx,yi+posy)]=1
+#	elif room.get_child(0).get_shape().get_class()=="RectangleShape2D":
+#		var width=room.get_child(0).get_shape().get_size().x/32-2
+#		var height=room.get_child(0).get_shape().get_size().y/32-2
+#		for x in range(posx-width/2, posx+width/2):
+#			for y in range(posy-round(height/2), posy+round(height/2)):
+#				data[Vector2(x, y)] = 1
+#	
+
 
 func _add_dors():
 	var all_dors={}
@@ -123,8 +223,8 @@ func _add_all_dors(all_dors:Dictionary):
 				var maybedor=[]
 				var hororver#dor is horizontal or vertical
 				if data.get(Vector2(x-1,y))==null:
-					for cell in range(7):
-						if data.get(Vector2(x+cell,y))==2 and cell>=6:
+					for cell in range(corridor_size*2+1):
+						if data.get(Vector2(x+cell,y))==2 and cell>=corridor_size*2:
 							maybedor=[]
 						elif data.get(Vector2(x+cell,y))==2:
 							maybedor.push_back(Vector2(x+cell,y))
@@ -135,8 +235,8 @@ func _add_all_dors(all_dors:Dictionary):
 							break
 						hororver=0
 				elif data.get(Vector2(x,y-1))==null:
-					for cell in range(7):
-						if data.get(Vector2(x,y+cell))==2 and cell>=6:
+					for cell in range(corridor_size*2+1):
+						if data.get(Vector2(x,y+cell))==2 and cell>=corridor_size*2:
 							maybedor=[]
 						elif data.get(Vector2(x,y+cell))==2:
 							maybedor.push_back(Vector2(x,y+cell))
@@ -147,8 +247,8 @@ func _add_all_dors(all_dors:Dictionary):
 							break
 						hororver=1
 				elif data.get(Vector2(x+1,y))==null:
-					for cell in range(7):
-						if data.get(Vector2(x-cell,y))==2 and cell>=6:
+					for cell in range(corridor_size*2+1):
+						if data.get(Vector2(x-cell,y))==2 and cell>=corridor_size*2:
 							maybedor=[]
 						elif data.get(Vector2(x-cell,y))==2:
 							maybedor.push_back(Vector2(x-cell,y))
@@ -159,8 +259,8 @@ func _add_all_dors(all_dors:Dictionary):
 							break
 						hororver=0
 				elif data.get(Vector2(x,y+1))==null:
-					for cell in range(7):
-						if data.get(Vector2(x,y-cell))==2 and cell>=6:
+					for cell in range(corridor_size*2+1):
+						if data.get(Vector2(x,y-cell))==2 and cell>=corridor_size*2:
 							maybedor=[]
 						elif data.get(Vector2(x,y-cell))==2:
 							maybedor.push_back(Vector2(x,y-cell))
@@ -181,37 +281,79 @@ func _add_all_dors(all_dors:Dictionary):
 
 func _choose_best_dors(all_dors:Dictionary):
 	for dor in all_dors:
-		var cell=0
-		var twosides=0
-		var x=dor.get_point_position(round(dor.get_point_count()/2)).x
-		var y=dor.get_point_position(round(dor.get_point_count()/2)).y
-		if all_dors[dor]:
-			while twosides<3:
-				cell+=1
-				if data.get(Vector2(x-cell,y))==1 and twosides%2==0:
-					break
-				elif data.get(Vector2(x-cell,y))!=2 and twosides%2==0:
-					twosides+=1
-				if data.get(Vector2(x+cell,y))==1 and twosides<=1:
-					break
-				elif data.get(Vector2(x+cell,y))!=2 and twosides<=1:
-					twosides+=2
-		else:
-			while twosides<3:
-				cell+=1
-				if data.get(Vector2(x,y-cell))==1 and twosides%2==0:
-					break
-				elif data.get(Vector2(x,y-cell))!=2 and twosides%2==0:
-					twosides+=1
-				if data.get(Vector2(x,y+cell))==1 and twosides<=1:
-					break
-				elif data.get(Vector2(x,y+cell))!=2 and twosides<=1:
-					twosides+=2
-		if twosides>=3:
+		var point =dor.get_point_position(0)
+		var near_cells=[point]
+		var index=0
+		var point_count=1
+		var is_way_to_room=false
+		while index<point_count:
+			point=near_cells[index]
+			if data.get(point-Vector2(1,0))==2 and !near_cells.has(point-Vector2(1,0)):
+				near_cells.push_back(point-Vector2(1,0))
+				point_count+=1
+			elif data.get(point-Vector2(1,0))==1:
+				is_way_to_room=true 
+				break
+				
+			if data.get(point-Vector2(0,1))==2 and !near_cells.has(point-Vector2(0,1)):
+				near_cells.push_back(point-Vector2(0,1))
+				point_count+=1
+			elif data.get(point-Vector2(0,1))==1:
+				is_way_to_room=true
+				break
+				
+			if data.get(point+Vector2(1,0))==2 and !near_cells.has(point+Vector2(1,0)):
+				near_cells.push_back(point+Vector2(1,0))
+				point_count+=1
+			elif data.get(point+Vector2(1,0))==1:
+				is_way_to_room=true
+				break
+				
+			if data.get(point+Vector2(0,1))==2 and !near_cells.has(point+Vector2(0,1)):
+				near_cells.push_back(point+Vector2(0,1))
+				point_count+=1
+			elif data.get(point+Vector2(0,1))==1:
+				is_way_to_room=true
+				break
+				
+			index+=1
+		if !is_way_to_room:
 			for pt in dor.get_point_count():
 				data[dor.get_point_position(pt)]=2
 		else:
 			dors.push_back(dor)
+		#Another way to identify dors
+		#var cell=0
+		#var twosides=0
+		#var x=dor.get_point_position(round(dor.get_point_count()/2)).x
+		#var y=dor.get_point_position(round(dor.get_point_count()/2)).y
+		#if all_dors[dor]:
+		#	while twosides<3:
+		#		cell+=1
+		#		if data.get(Vector2(x-cell,y))==1 and twosides%2==0:
+		#			break
+		#		elif data.get(Vector2(x-cell,y))!=2 and twosides%2==0:
+		#			twosides+=1
+		#		if data.get(Vector2(x+cell,y))==1 and twosides<=1:
+		#			break
+		#		elif data.get(Vector2(x+cell,y))!=2 and twosides<=1:
+		#			twosides+=2
+		#else:
+		#	while twosides<3:
+		#		cell+=1
+		#		if data.get(Vector2(x,y-cell))==1 and twosides%2==0:
+		#			break
+		#		elif data.get(Vector2(x,y-cell))!=2 and twosides%2==0:
+		#			twosides+=1
+		#		if data.get(Vector2(x,y+cell))==1 and twosides<=1:
+		#			break
+		#		elif data.get(Vector2(x,y+cell))!=2 and twosides<=1:
+		#			twosides+=2
+		#if twosides>=3:
+		#	for pt in dor.get_point_count():
+		#		data[dor.get_point_position(pt)]=2
+		#else:
+		#	dors.push_back(dor)
 	all_dors.clear()
 
 func _change_dors_mode():
@@ -237,30 +379,30 @@ func _change_dors_mode():
 					#level.set_cell(1,Vector2(x,y+1),0,Vector2(2,5))
 				level.set_cell(1,dor.get_point_position(pt),0,Vector2(30,4))
 
-func _add_monsters(rng:RandomNumberGenerator, room:Rect2):
+func _add_monsters(rng:RandomNumberGenerator, room:Area2D):
 	if $Player.position!=Vector2(0,0):
 		for en in rng.randi_range(1,2):
 			var child_enemy=get_node("Red_monster").duplicate()
 			children.push_back(child_enemy)
 			add_child(child_enemy)
-			child_enemy.position=room.get_center()*32+Vector2(rng.randi_range(-150,150),rng.randi_range(-150,150))
+			child_enemy.position=room.position+Vector2(rng.randi_range(-150,150),rng.randi_range(-150,150))
 			child_enemy.visible=true
 	else:
-		$Player.position=room.get_center()*32
+		$Player.position=room.position
 
 func _add_connections(rng: RandomNumberGenerator):
 	var k=1
 	for room in rooms:
 		var distace=9999999
-		var nearest_room:Rect2
+		var nearest_room:Area2D
 		for room2_index in range(k, rooms.size()):
-			if distace>room.get_center().distance_squared_to(rooms[room2_index].get_center()):
-				distace=room.get_center().distance_squared_to(rooms[room2_index].get_center())
+			if distace>(room.position/32).distance_squared_to(rooms[room2_index].position/32):
+				distace=(room.position/32).distance_squared_to(rooms[room2_index].position/32)
 				nearest_room=rooms[room2_index]
 		k+=1
 		if nearest_room:
-			var room_center1 = room.get_center()
-			var room_center2 = nearest_room.get_center()
+			var room_center1 = room.position/32
+			var room_center2 = nearest_room.position/32
 			if !rng.randi_range(0, 1):
 				_add_corridor(room_center1.x, room_center2.x, room_center1.y, Vector2.AXIS_X)#Exit horizontal
 				_add_corridor(room_center1.y, room_center2.y, room_center2.x, Vector2.AXIS_Y)#Enter vertical
@@ -270,7 +412,7 @@ func _add_connections(rng: RandomNumberGenerator):
 
 
 func _add_corridor( start: int, end: int, constant: int, axis: int) :
-	for cor_length in 3:
+	for cor_length in corridor_size:
 		for t in range(min(start, end), max(start, end) + cor_length+1):
 			var point = Vector2.ZERO
 			match axis:
@@ -278,14 +420,6 @@ func _add_corridor( start: int, end: int, constant: int, axis: int) :
 				Vector2.AXIS_Y: point = Vector2(constant+cor_length, t)
 			if data.get(point)!=1:
 				data[point] = 2
-
-func _intersects(room: Rect2):
-	var out = false
-	for room_other in rooms:
-		if room.intersects(room_other, true):
-			out = true
-			break
-	return out
 
 func delete_weapon_from_scene(weapon_path):
 	get_node(weapon_path).queue_free()
