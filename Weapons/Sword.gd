@@ -24,7 +24,6 @@ func _process(_delta):
 	if rotation_direction*rotation_degrees>=180:
 		rotation_degrees=180*rotation_direction
 		atk_speed=-atk_speed
-		print(true)
 		animation_part=3
 	if rotation_direction*rotation_degrees<=0 and animation_part==3:
 		rotation_degrees=0*rotation_direction

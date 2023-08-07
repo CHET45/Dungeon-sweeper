@@ -1,4 +1,5 @@
 extends CharacterBody2D
+signal dead
 @export var movement_speed: float
 var speed
 @export var health:int
@@ -74,7 +75,7 @@ func _process(_delta):
 			$animation.enemy_animation()
 		
 	else:
-		queue_free()
+		emit_signal("dead",get_node("."))
 
 func body_entered(body):
 	if body.name=="Player":

@@ -1,8 +1,8 @@
 extends Node2D
 
-@export var change_generation_method=1
+
 @export var level_size = Vector2(150, 150)
-@export var rooms_size = Vector2(18, 20)
+@export var rooms_size = Vector2(35, 45)
 @export var rooms_max = 10
 @export var corridor_size=3
 var total_level_area:float
@@ -20,12 +20,12 @@ var child
 var child_number
 
 func _ready():
+	
 	total_level_area=level_size.x-4*level_size.y-4
 	_setup_camera()
 	weapon_list_obj=weapon_stock_obj.get_node("Weapon_list/Container")
 	$CanvasLayer.visible=true
 	weapon_stock_obj.visible=false
-	_generate()
 
 func _process(_delta):
 	
@@ -34,9 +34,9 @@ func _process(_delta):
 	elif Input.is_action_pressed("zoom-") and camera.zoom>Vector2(0,0):
 		camera.zoom-=Vector2(0.01,0.01) 
 	if Input.is_action_just_pressed("re_generate"):
-		get_tree().reload_current_scene()
+		call_deferred("_generate")
 	if Input.is_action_just_pressed("doors_updown"):
-		call_deferred("_change_dors_mode")#_change_dors_mode()
+		_change_dors_mode()
 	if Input.is_action_just_pressed("Change_weapon") and change_weapon_flag:
 		weapon_stock_obj.visible=true
 		change_weapon_flag=false
@@ -45,6 +45,7 @@ func _process(_delta):
 		change_weapon_flag=true
 	if !change_weapon_flag and !first and $Player.can_flip_h:
 		if Input.is_action_just_released("weapon_scroll_up"):
+				print("up")
 				child_number+=1
 				if child_number>weapon_list_obj.get_child_count()-1:
 					child_number=0
@@ -57,28 +58,25 @@ func _process(_delta):
 			child.emit_signal("weapon_button_pressed",child_number)
 func _setup_camera() :
 	camera.position = level.map_to_local(level_size / 2)
-	camera.zoom = level_size/(level_size*7)
+	var z = max(level_size.x, level_size.y) / (4.5*level_size.x)
+	camera.zoom = Vector2(z, z)
 
 func _generate():
-	var regenerate=true
 	var rng = RandomNumberGenerator.new()
-	while regenerate:
-		for child_enemy in children:
-			child_enemy.queue_free()
-		$Player.position=Vector2(0,0)
-		level.clear()
-		data={}
-		children=[]
-		for room in rooms:
-			remove_child(room)
-		rooms = []
-		dors=[]
-		regenerate=_generate_data(rng)
-	_reduce_room_area()
+	for child_enemy in children:
+		child_enemy.queue_free()
+	$Player.position=Vector2(0,0)
+	level.clear()
+	data={}
+	children=[]
+	for room in rooms:
+		remove_child(room)
+	rooms = []
+	dors=[]
+	_generate_data(rng)
 	_add_connections(rng)
 	_add_dors()
 	_fill_level()
-	_change_dors_mode()
 	
 func _fill_level():
 	for point in data:
@@ -94,102 +92,112 @@ func _fill_level():
 func _generate_data(rng:RandomNumberGenerator):
 	rng.randomize()
 	var room:Area2D
-	var tries_before_regeneration=20
 	while rooms.size()<7 and rooms.size()<rooms_max:
-		room = _get_random_room(rng)
-		if room:
-			tries_before_regeneration=20
-			rooms.push_back(room)
-			add_child(room)
-			_add_monsters(rng,room)
-		elif tries_before_regeneration<=0 and data.size()>7000:
-			return true
-		elif tries_before_regeneration<=-30:
-			return true
-		else:
-			tries_before_regeneration-=1
-		print(snapped(rooms.size()/7.0,0.1))
-	return false
+		for r in rooms_max:
+			room = _get_random_room(rng)
+			if room:
+				rooms.push_back(room)
+				add_child(room)
+				#_add_room(room)
+				_add_monsters(rng,room)
 
 func _get_random_room(rng: RandomNumberGenerator) :
 	var area=Area2D.new()
 	var col=CollisionShape2D.new()
-	area.add_child(col)
 	var shape
 	var posx:int
 	var posy:int
 	var c=32
 	var room_dic={}
+	var intersects=false
 	if rng.randi_range(0,1):
 		var y:int
-		var radius=rng.randi_range(rooms_size.x,rooms_size.y)*1.3
-		posx = rng.randi_range(2+radius, level_size.x - radius - 2)
-		posy = rng.randi_range(2+radius, level_size.y - radius - 2)
+		var radius=rng.randi_range(rooms_size.x,rooms_size.y)/1.5
+		posx = rng.randi_range(1+radius, level_size.x - radius - 1)
+		posy = rng.randi_range(1+radius, level_size.y - radius - 1)
 		shape=CircleShape2D.new()
 		shape.set_radius(radius*c)
 		for xi in range(-radius,radius+1):
+			if !intersects:
+				y=round(sqrt(-xi*xi+radius*radius))
+				for yi in range(-y,y):
+					if !data.has(Vector2(xi+posx,yi+posy)):
+						room_dic[Vector2(xi+posx,yi+posy)]=1
+					else:
+						room_dic={}
+						intersects=true
+			else:
+				return null
+		for xi in range(-radius,radius+1):
 			y=round(sqrt(-xi*xi+radius*radius))
-			for yi in range(-y,y):
-				if !data.has(Vector2(xi+posx,yi+posy)):
-					room_dic[Vector2(xi+posx,yi+posy)]=1
-				else:
-					area.queue_free()
-					return null
+			for yi in range(-y,-y+3):
+				room_dic[Vector2(xi+posx,yi+posy)]=null
+			for yi in range(y-2,y+1):
+				room_dic[Vector2(xi+posx,yi+posy)]=null
+		for yi in range(-radius,radius+1):
+			var x=round(sqrt(-yi*yi+radius*radius))
+			for xi in range(-x,-x+3):
+				room_dic[Vector2(xi+posx,yi+posy)]=null
+			for xi in range(x-2,x+1):
+				room_dic[Vector2(xi+posx,yi+posy)]=null
 	else:
 		var width = rng.randi_range(rooms_size.x, rooms_size.y)
-		var height =rng.randi_range(rooms_size.x, rooms_size.y)
-		posx = rng.randi_range(2+width, level_size.x - width - 2)
-		posy = rng.randi_range(2+height, level_size.y - height - 2)
+		var height = rng.randi_range(rooms_size.x, rooms_size.y)
+		posx = rng.randi_range(2+ceil(width/2), level_size.x - width/2 - 2)
+		posy = rng.randi_range(2+ceil(height/2), level_size.y - height/2 - 2)
 		shape=RectangleShape2D.new()
-		shape.set_size(Vector2(width,height)*2*c)
-		for xi in range(posx-width, posx+width):
-			for yi in range(posy-height, posy+height):
-				if !data.has(Vector2(xi, yi)):
-					room_dic[Vector2(xi, yi)] = 1
-				else:
-					area.queue_free()
-					return null
-	col.set_shape(shape)
-	area.position=Vector2(posx,posy)*c
-	data.merge(room_dic)
-	return area
+		shape.set_size(Vector2(width,height)*c)
+		for xi in range(posx-width/2, posx+width/2):
+			if !intersects:
+				for yi in range(posy-height/2, posy+height/2):
+					if !data.has(Vector2(xi, yi)):
+						room_dic[Vector2(xi, yi)] = 1
+					else:
+						room_dic={}
+						intersects=true
+			else:
+				return null
+		for w in 3:
+			for yi in range(posy-height/2, posy+height/2):
+				room_dic.erase(Vector2(ceili(posx+width/2)-w, yi))
+				room_dic.erase(Vector2(ceili(posx-width/2)+w, yi))
+			for xi in range(ceili(posx-width/2), ceili(posx+width/2)):
+				room_dic.erase(Vector2(xi,ceili(posy+height/2)-w))
+				room_dic.erase(Vector2(xi,ceili(posy-height/2)+w))
+	if room_dic:
+		col.set_shape(shape)
+		area.add_child(col)
+		area.position=Vector2(posx,posy)*c
+		data.merge(room_dic)
+		return area
+	else:
+		return null
 
-func _reduce_room_area():
-	for room in rooms:
-		var posx=room.position.x/32
-		var posy=room.position.y/32
-		if room.get_child(0).get_shape().get_class()=="CircleShape2D":
-			var radius=room.get_child(0).get_shape().get_radius()/32
-			for xi in range(-radius,radius+1):
-				var y=round(sqrt(-xi*xi+radius*radius))
-				for yi in range(-y,-y+3):
-					data.erase(Vector2(xi+posx,yi+posy))
-				for yi in range(y-2,y+1):
-					data.erase(Vector2(xi+posx,yi+posy))
-			for yi in range(-radius,radius+1):
-				var x=round(sqrt(-yi*yi+radius*radius))
-				for xi in range(-x,-x+3):
-					data.erase(Vector2(xi+posx,yi+posy))
-				for xi in range(x-2,x+1):
-					data.erase(Vector2(xi+posx,yi+posy))
-		elif room.get_child(0).get_shape().get_class()=="RectangleShape2D":
-			var width=room.get_child(0).get_shape().get_size().x/64
-			var height=room.get_child(0).get_shape().get_size().y/64
-			for w in 3:
-				for xi in range(posx-width, posx+width):
-					data[Vector2(xi,posy+height-w)]=null
-					data[Vector2(xi,posy-height+w)]=null
-				for yi in range(posy-height, posy+height):
-					data[Vector2(posx+width-w, yi)]=null
-					data[Vector2(posx-width+w, yi)]=null	
-	print("2")
+#func _add_room( room:Area2D):
+#	rooms.push_back(room)
+#	var col:CollisionShape2D=room.get_child(0)
+#	var posx=room.position.x/32
+#	var posy=room.position.y/32
+#	if col.get_shape().get_class()=="CircleShape2D":
+#		var y:int
+#		var radius=room.get_child(0).get_shape().get_radius()/32
+#		for xi in range(-radius,radius+1):
+#			y=-sqrt(-xi*xi+radius*radius)
+#			for yi in range(y,-y):
+#				data[Vector2(xi+posx,yi+posy)]=1
+#	elif room.get_child(0).get_shape().get_class()=="RectangleShape2D":
+#		var width=room.get_child(0).get_shape().get_size().x/32-2
+#		var height=room.get_child(0).get_shape().get_size().y/32-2
+#		for x in range(posx-width/2, posx+width/2):
+#			for y in range(posy-round(height/2), posy+round(height/2)):
+#				data[Vector2(x, y)] = 1
+#	
+
 
 func _add_dors():
 	var all_dors={}
 	_add_all_dors(all_dors)
-	print("4")
 	_choose_best_dors(all_dors)
-	print("5")
 
 func _add_all_dors(all_dors:Dictionary):
 	for x in level_size.x:
@@ -246,7 +254,7 @@ func _add_all_dors(all_dors:Dictionary):
 							break
 						hororver=1
 				if maybedor:
-					var linedor=Line2D.new()
+					var linedor=$Line2D.duplicate()
 					for point in maybedor:
 						data[point]=3
 						linedor.add_point(point)
@@ -332,44 +340,27 @@ func _choose_best_dors(all_dors:Dictionary):
 	all_dors.clear()
 
 func _change_dors_mode():
-	#if level.get_cell_atlas_coords(1,data.find_key(3))==Vector2i(30,4):
-	for dor in dors:
-		print((dor.get_point_position(0)*32).distance_to($Player.position))
-		if (dor.get_point_position(0)*32).distance_to($Player.position)<1000:
+	if level.get_cell_atlas_coords(1,data.find_key(3))==Vector2i(30,4):
+		for dor in dors:
 			for pt in dor.get_point_count():
-				if level.get_cell_atlas_coords(1,dor.get_point_position(pt))==Vector2i(30,4):
-					if data.get(dor.get_point_position(pt)-Vector2(0,1))!=3:
-						#level.set_cell(0,Vector2(x,y-1),0,Vector2(12,4))
-						level.set_cell(1,dor.get_point_position(pt)-Vector2(0,1),0,Vector2(2,5))
-					if data.get(dor.get_point_position(pt)+Vector2(0,1))!=3:
-						level.set_cell(1,dor.get_point_position(pt)+Vector2(0,1),0,Vector2(24,6))
-						#level.set_cell(1,Vector2(x,y+1),0,Vector2(2,5))
-					level.set_cell(0,dor.get_point_position(pt),0,Vector2(12,4))
-					level.set_cell(1,dor.get_point_position(pt),0,Vector2(2,5))
-				else:
-					if data.get(dor.get_point_position(pt)-Vector2(0,1))!=3:
-						#level.set_cell(0,Vector2(x,y-1),0,Vector2(12,4))
-						level.set_cell(1,dor.get_point_position(pt)-Vector2(0,1),0,Vector2(46,6))
-					if data.get(dor.get_point_position(pt)+Vector2(0,1))!=3:
-						level.set_cell(1,dor.get_point_position(pt)+Vector2(0,1),0,Vector2(50,4))
-						#level.set_cell(1,Vector2(x,y+1),0,Vector2(2,5))
-					level.set_cell(1,dor.get_point_position(pt),0,Vector2(30,4))
-		else:
-			continue
-	#else:
-	#	for dor in dors:
-	#		print((dor.get_point_position(0)*32).distance_to($Player.position))
-	#		if dor.get_point_position(0).distance_to($Player.position)<2000:
-	#			for pt in dor.get_point_count():
-	#				if data.get(dor.get_point_position(pt)-Vector2(0,1))!=3:
-	#					#level.set_cell(0,Vector2(x,y-1),0,Vector2(12,4))
-	#					level.set_cell(1,dor.get_point_position(pt)-Vector2(0,1),0,Vector2(46,6))
-	#				if data.get(dor.get_point_position(pt)+Vector2(0,1))!=3:
-	#					level.set_cell(1,dor.get_point_position(pt)+Vector2(0,1),0,Vector2(50,4))
-	#					#level.set_cell(1,Vector2(x,y+1),0,Vector2(2,5))
-	#				level.set_cell(1,dor.get_point_position(pt),0,Vector2(30,4))
-	#		else:
-	#			continue
+				if data.get(dor.get_point_position(pt)-Vector2(0,1))!=3:
+					#level.set_cell(0,Vector2(x,y-1),0,Vector2(12,4))
+					level.set_cell(1,dor.get_point_position(pt)-Vector2(0,1),0,Vector2(2,5))
+				if data.get(dor.get_point_position(pt)+Vector2(0,1))!=3:
+					level.set_cell(1,dor.get_point_position(pt)+Vector2(0,1),0,Vector2(24,6))
+					#level.set_cell(1,Vector2(x,y+1),0,Vector2(2,5))
+				level.set_cell(0,dor.get_point_position(pt),0,Vector2(12,4))
+				level.set_cell(1,dor.get_point_position(pt),0,Vector2(2,5))
+	else:
+		for dor in dors:
+			for pt in dor.get_point_count():
+				if data.get(dor.get_point_position(pt)-Vector2(0,1))!=3:
+					#level.set_cell(0,Vector2(x,y-1),0,Vector2(12,4))
+					level.set_cell(1,dor.get_point_position(pt)-Vector2(0,1),0,Vector2(46,6))
+				if data.get(dor.get_point_position(pt)+Vector2(0,1))!=3:
+					level.set_cell(1,dor.get_point_position(pt)+Vector2(0,1),0,Vector2(50,4))
+					#level.set_cell(1,Vector2(x,y+1),0,Vector2(2,5))
+				level.set_cell(1,dor.get_point_position(pt),0,Vector2(30,4))
 
 func _add_monsters(rng:RandomNumberGenerator, room:Area2D):
 	if $Player.position!=Vector2(0,0):
@@ -388,8 +379,8 @@ func _add_connections(rng: RandomNumberGenerator):
 		var distace=9999999
 		var nearest_room:Area2D
 		for room2_index in range(k, rooms.size()):
-			if distace>(room.position/32).distance_squared_to(rooms[room2_index].position/32):
-				distace=(room.position/32).distance_squared_to(rooms[room2_index].position/32)
+			if distace>room.position.distance_squared_to(rooms[room2_index].position):
+				distace=room.position.distance_squared_to(rooms[room2_index].position)
 				nearest_room=rooms[room2_index]
 		k+=1
 		if nearest_room:
@@ -401,7 +392,6 @@ func _add_connections(rng: RandomNumberGenerator):
 			else:
 				_add_corridor(room_center1.y, room_center2.y, room_center1.x, Vector2.AXIS_Y)#Exit vertical
 				_add_corridor(room_center1.x, room_center2.x, room_center2.y, Vector2.AXIS_X)#Enter horizontal
-	print("3")
 
 
 func _add_corridor( start: int, end: int, constant: int, axis: int) :
@@ -413,6 +403,12 @@ func _add_corridor( start: int, end: int, constant: int, axis: int) :
 				Vector2.AXIS_Y: point = Vector2(constant+cor_length, t)
 			if data.get(point)!=1:
 				data[point] = 2
+
+func _intersects(room: Area2D):
+	for other_room in rooms:
+		if room.overlaps_area(other_room):
+			return true
+	return false
 
 func delete_weapon_from_scene(weapon_path):
 	get_node(weapon_path).queue_free()
@@ -455,9 +451,3 @@ func weapon_button_pressed(_weapon_index):
 	#chtobi menjalos pri nazatii na knopku
 	#child_number=weapon_index
 	pass
-
-
-func _on_creature_dead(creature:Node2D):
-	children.erase(creature)
-	remove_child(creature)
-	creature.queue_free()
