@@ -33,11 +33,11 @@ collision_mask = 59
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Release_damage"]
 
 [node name="HP" type="ProgressBar" parent="."]
-visible = false
 offset_left = -40.0
 offset_top = -56.0
 offset_right = 48.0
 offset_bottom = -29.0
+show_percentage = false
 
 [node name="Damage_cooldown" type="Timer" parent="."]
 

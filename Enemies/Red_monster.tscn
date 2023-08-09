@@ -23,9 +23,6 @@ height = 124.0
 [node name="Red_monster" instance=ExtResource("1_4jpx8")]
 collision_mask = 60
 script = ExtResource("2_4khk4")
-movement_speed = 150.0
-max_health = 10
-damage = 1
 
 [node name="Collision" parent="Collision_for_enemies" index="0"]
 position = Vector2(0, -22)
@@ -35,9 +32,6 @@ shape = SubResource("CapsuleShape2D_paifm")
 texture = ExtResource("1_0w0l3")
 hframes = 8
 script = ExtResource("2_rywsx")
-
-[node name="atack_timer" parent="animation" index="1"]
-wait_time = 0.13
 
 [node name="Cillision_for_everything" parent="." index="2"]
 shape = SubResource("CapsuleShape2D_vwjnl")

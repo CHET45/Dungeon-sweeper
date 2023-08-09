@@ -44,16 +44,19 @@ position = Vector2(-61, -414)
 [node name="Red_monster" parent="." instance=ExtResource("3_20m28")]
 position = Vector2(174, -124)
 disable_mode = 0
+speed = null
 max_health = 100
 
 [node name="Red_monster2" parent="." instance=ExtResource("3_20m28")]
 position = Vector2(413, -57)
 disable_mode = 0
+speed = null
 max_health = 100
 
 [node name="Red_monster3" parent="." instance=ExtResource("3_20m28")]
 position = Vector2(373, -248)
 disable_mode = 0
+speed = null
 max_health = 100
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
