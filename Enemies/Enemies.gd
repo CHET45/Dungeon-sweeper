@@ -33,7 +33,6 @@ func actor_setup():
 	# Wait for the first physics frame so the NavigationServer can sync.
 	await get_tree().physics_frame
 	set_movement_target(get_parent().get_node("Player").global_position)
-	$Player_radar.monitoring=true
 
 func set_movement_target(target_to_move: Vector2):
 	navigation_agent.target_position = target_to_move
@@ -42,11 +41,11 @@ func _process(_delta):
 	if health>0:
 		if see_player:
 			set_movement_target(get_parent().get_node("Player").global_position)
-			movement_speed=speed
+			#movement_speed=speed
 		else:
 			set_movement_target(position)
-			speed=movement_speed
-			movement_speed=0
+			#speed=movement_speed
+			#movement_speed=0
 		$HP.value=health
 		var current_agent_position: Vector2 = global_position
 		next_path_position= navigation_agent.get_next_path_position()
@@ -113,14 +112,3 @@ func Damage_animation():
 		RGB-=1
 	else:
 		RGB_flag=true
-
-
-func _on_player_radar_body_entered(body):
-	if body.name=="Player":
-		see_player=true
-		$Player_radar/CollisionShape2D.scale*=3.5
-
-func _on_player_radar_body_exited(body):
-	if body.name=="Player":
-		$Player_radar/CollisionShape2D.scale/=3.5
-		see_player=false

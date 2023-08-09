@@ -64,12 +64,6 @@ shape = SubResource("CapsuleShape2D_34slc")
 path_postprocessing = 1
 debug_enabled = true
 
-[node name="Player_radar" parent="." index="8"]
-collision_layer = 4
-
-[node name="CollisionShape2D" parent="Player_radar" index="0"]
-position = Vector2(8, 0)
-
 [connection signal="timeout" from="animation/Timer" to="animation" method="enemy_animation"]
 [connection signal="timeout" from="animation/atack_timer" to="animation" method="enemy_atack_animation"]
 [connection signal="body_entered" from="Release_damage" to="." method="body_entered"]

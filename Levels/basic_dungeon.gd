@@ -103,4 +103,9 @@ func _player_enters_room(body:Node2D):
 	if body.name=="Player":
 		var nearest_room= find_nearest_room(body.position)
 		if !used_rooms.has(nearest_room):
+			activate_enemies(nearest_room)
 			_change_dors_mode(false,nearest_room.position)
+
+func activate_enemies(room:Area2D):
+	for enemy in enemies.get(room):
+		enemy.see_player=true
