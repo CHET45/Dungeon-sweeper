@@ -6,7 +6,7 @@
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_y805u"]
 atlas = ExtResource("3_m7t4e")
-region = Rect2(384, 45, 42, 19)
+region = Rect2(384, 46, 42, 18)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gpb48"]
 size = Vector2(17, 38)
@@ -16,7 +16,7 @@ position = Vector2(287, 161)
 script = ExtResource("2_pgc8t")
 weapon_node = NodePath(".")
 damage = 15
-atk_speed = 20.0
+atk_speed = 1000.0
 
 [node name="Weapon_sprite" parent="." index="0"]
 rotation = 1.5708

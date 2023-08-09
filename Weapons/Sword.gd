@@ -8,13 +8,13 @@ func _ready():
 	#$Weapon_sprite.texture=$Weapon_sprite
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
+func _process(delta):
 	$Weapon_sprite.flip_h=flip
 	if animation:
 		if animation_part==1:
 			animation_part=2
 			atk_speed=-atk_speed/3.5
-		rotation_degrees+=atk_speed*rotation_direction
+		rotation_degrees+=atk_speed*rotation_direction*delta
 	if flip:
 		rotation_direction=-1
 	else:

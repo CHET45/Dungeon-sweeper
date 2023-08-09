@@ -16,7 +16,7 @@ position = Vector2(212, 114)
 script = ExtResource("1_fa8sd")
 weapon_node = NodePath(".")
 damage = 5
-atk_speed = 20.0
+atk_speed = 1000.0
 
 [node name="Weapon_sprite" parent="." index="0"]
 position = Vector2(0, -10.3)

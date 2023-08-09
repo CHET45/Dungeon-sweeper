@@ -9,14 +9,14 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
+func _process(delta):
 	$Weapon_sprite.flip_v=flip
 	$Weapon_area.position.x=-$Weapon_sprite.offset.y
 	if animation:
 		if animation_part==1:
 			animation_part=2
 			atk_speed=-atk_speed/4
-		rotation_degrees+=atk_speed*rotation_direction
+		rotation_degrees+=atk_speed*rotation_direction*delta
 	if flip:
 		$Weapon_sprite.offset.y=4
 		rotation_direction=-1
@@ -27,6 +27,7 @@ func _process(_delta):
 	if rotation_direction*rotation_degrees<=-40:
 		atk_speed=-atk_speed*4
 	if rotation_direction*rotation_degrees>=120:
+		rotation_degrees=120*rotation_direction
 		atk_speed=-atk_speed/2.5
 		animation_part=3
 		$Weapon_area.set_collision_layer_value(7,false)

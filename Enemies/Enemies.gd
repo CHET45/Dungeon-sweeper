@@ -18,6 +18,7 @@ var RGB_flag=true
 var damage_player=true
 signal hit_player
 @export var see_player=false
+@export var room:Area2D
 func _ready():
 	speed=movement_speed
 	health=max_health
@@ -75,7 +76,7 @@ func _process(_delta):
 			$animation.enemy_animation()
 		
 	else:
-		emit_signal("dead",get_node("."))
+		emit_signal("dead",get_node("."),room)
 
 func body_entered(body):
 	if body.name=="Player":
