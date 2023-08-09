@@ -1,10 +1,10 @@
 extends CharacterBody2D
 signal dead
-@export var movement_speed: float
-var speed
+@export var speed: float
 @export var health:int
 @export var max_health:int
-@export var damage:int
+@export var damage:float
+@export var atack_speed:float
 @onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 var next_path_position: Vector2
 var in_motion=false
@@ -20,7 +20,8 @@ signal hit_player
 @export var see_player=false
 @export var room:Area2D
 func _ready():
-	speed=movement_speed
+	Randomize_stats()
+	$animation/atack_timer.wait_time=atack_speed
 	health=max_health
 	$HP.max_value=max_health
 	navigation_agent.path_desired_distance = 4.0
@@ -52,7 +53,7 @@ func _process(_delta):
 	
 		var new_velocity: Vector2 = next_path_position - current_agent_position
 		new_velocity = new_velocity.normalized()
-		new_velocity = new_velocity * movement_speed
+		new_velocity = new_velocity * speed
 	
 		velocity = new_velocity
 		if velocity.x<0:
@@ -112,3 +113,11 @@ func Damage_animation():
 		RGB-=1
 	else:
 		RGB_flag=true
+
+func Randomize_stats():
+	var rng=RandomNumberGenerator.new()
+	rng.randomize()
+	max_health=rng.randi_range(50,150)
+	speed=rng.randf_range(200-max_health*0.8,200-max_health*0.2)
+	damage=rng.randf_range(max_health*0.005,max_health*0.018)
+	atack_speed=rng.randf_range(damage*0.115,damage*0.145)

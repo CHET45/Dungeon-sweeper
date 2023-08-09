@@ -106,7 +106,6 @@ position = Vector2(-232, -162)
 visible = false
 position = Vector2(-1625, -822)
 disable_mode = 0
-max_health = 100
 
 [node name="Axe" parent="." instance=ExtResource("8_oxcd8")]
 position = Vector2(-213, -166)
