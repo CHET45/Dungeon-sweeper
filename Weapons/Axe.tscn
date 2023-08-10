@@ -16,7 +16,7 @@ position = Vector2(287, 161)
 script = ExtResource("2_pgc8t")
 weapon_node = NodePath(".")
 damage = 15
-atk_speed = 1000.0
+atk_speed = 900.0
 
 [node name="Weapon_sprite" parent="." index="0"]
 rotation = 1.5708

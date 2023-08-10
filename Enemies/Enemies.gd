@@ -117,7 +117,8 @@ func Damage_animation():
 func Randomize_stats():
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
-	max_health=rng.randi_range(50,150)
+	max_health=rng.randi_range(max_health-50,max_health+50)
 	speed=rng.randf_range(200-max_health*0.8,200-max_health*0.2)
 	damage=rng.randf_range(max_health*0.005,max_health*0.018)
 	atack_speed=rng.randf_range(damage*0.115,damage*0.145)
+	scale*=max_health*0.01+0.2
