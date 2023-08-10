@@ -110,7 +110,7 @@ func _player_enters_room(body:Node2D):
 func spawn_weapons(room:Area2D):
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
-	var weapon_count=rng.randi_range(1,4)
+	var weapon_count=rng.randi_range(1,5)
 	for x in range(0,weapon_count):
 		var weapon=all_weapons[rng.randi_range(0,all_weapons.size()-1)]
 		if weapon.get_parent():
