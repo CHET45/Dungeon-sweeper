@@ -3,17 +3,10 @@
 [ext_resource type="Script" path="res://Enemies/Enemies.gd" id="1_vlrhh"]
 
 [node name="Enemy" type="CharacterBody2D"]
-scale = Vector2(0.5, 0.5)
 disable_mode = 2
 collision_layer = 4
 collision_mask = 61
 script = ExtResource("1_vlrhh")
-
-[node name="Collision_for_enemies" type="CharacterBody2D" parent="."]
-collision_layer = 128
-collision_mask = 128
-
-[node name="Collision" type="CollisionShape2D" parent="Collision_for_enemies"]
 
 [node name="animation" type="Sprite2D" parent="."]
 position = Vector2(0, -26)

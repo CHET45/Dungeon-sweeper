@@ -1,60 +1,58 @@
-[gd_scene load_steps=9 format=3 uid="uid://cglkt5fttl6id"]
+[gd_scene load_steps=8 format=3 uid="uid://cglkt5fttl6id"]
 
 [ext_resource type="Texture2D" uid="uid://ctj3808fx5tc" path="res://Tiles/Red_monstr_animation.tres" id="1_0w0l3"]
 [ext_resource type="PackedScene" uid="uid://kioyo7ql75rd" path="res://Enemies/Enemy.tscn" id="1_4jpx8"]
 [ext_resource type="Script" path="res://Enemies/Red_monster.gd" id="2_4khk4"]
 [ext_resource type="Script" path="res://Enemies/RedMonsterAnimation.gd" id="2_rywsx"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_paifm"]
-radius = 98.0
-height = 196.0
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_vwjnl"]
-height = 24.0
+custom_solver_bias = 1.0
+radius = 31.0
+height = 62.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uwtu1"]
-radius = 72.0
-height = 160.0
+radius = 64.0
+height = 128.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34slc"]
-radius = 50.0
-height = 124.0
+radius = 37.0
+height = 74.0
 
 [node name="Red_monster" instance=ExtResource("1_4jpx8")]
-collision_mask = 60
+collision_layer = 132
+collision_mask = 188
 script = ExtResource("2_4khk4")
+max_health = 100
 
-[node name="Collision" parent="Collision_for_enemies" index="0"]
-position = Vector2(0, -22)
-shape = SubResource("CapsuleShape2D_paifm")
-
-[node name="animation" parent="." index="1"]
+[node name="animation" parent="." index="0"]
+scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_0w0l3")
 hframes = 8
 script = ExtResource("2_rywsx")
 
-[node name="Cillision_for_everything" parent="." index="2"]
+[node name="Cillision_for_everything" parent="." index="1"]
+position = Vector2(0, -24)
 shape = SubResource("CapsuleShape2D_vwjnl")
 
-[node name="Release_damage" parent="." index="3"]
-visible = false
-
 [node name="CollisionShape2D" parent="Release_damage" index="0"]
-position = Vector2(0, -22)
+position = Vector2(0, -15)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_uwtu1")
 
-[node name="Damage_cooldown" parent="." index="5"]
+[node name="HP" parent="." index="3"]
+offset_left = -21.0
+offset_top = -67.0
+offset_right = 23.0
+offset_bottom = -51.0
+
+[node name="Damage_cooldown" parent="." index="4"]
 wait_time = 0.4
 
-[node name="Take_damage" parent="." index="6"]
-visible = false
-
 [node name="CollisionShape2D" parent="Take_damage" index="0"]
-position = Vector2(0, -20)
+position = Vector2(1, -24)
 shape = SubResource("CapsuleShape2D_34slc")
 
-[node name="NavigationAgent2D" parent="." index="7"]
+[node name="NavigationAgent2D" parent="." index="6"]
 path_postprocessing = 1
 debug_enabled = true
 

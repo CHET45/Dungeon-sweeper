@@ -8,12 +8,14 @@ var first=true
 var weapon_list_obj
 var child 
 var child_number
+var all_weapons=[]
 
 func _ready():
-	_setup_camera()
+	all_weapons=get_tree().get_nodes_in_group("weapons")
 	weapon_list_obj=weapon_stock_obj.get_node("Weapon_list/Container")
 	$CanvasLayer.visible=true
 	weapon_stock_obj.visible=false
+	_setup_camera()
 	_generate()
 
 func _process(_delta):
@@ -48,8 +50,9 @@ func _setup_camera() :
 	camera.position = (level_size/2)*32
 	camera.zoom = level_size/(level_size*7)
 
-func delete_weapon_from_scene(weapon_path):
-	get_node(weapon_path).queue_free()
+func delete_weapon_from_scene(weapon_path):	
+	await get_tree().physics_frame
+	remove_child(get_node(weapon_path))
 
 
 func add_weapon_to_weapon_stock(weapon_texture):
@@ -96,16 +99,33 @@ func _on_creature_dead(creature:Node2D,room):
 	remove_child(creature)
 	creature.queue_free()
 	if enemies.get(room).size()<=0:
-		used_rooms[room]=true
-		_change_dors_mode(true,room.position)
+		room_sweeped(room)
 
 func _player_enters_room(body:Node2D):
 	if body.name=="Player":
 		var nearest_room= find_nearest_room(body.position)
 		if !used_rooms.has(nearest_room):
-			activate_enemies(nearest_room)
-			_change_dors_mode(false,nearest_room.position)
+			activate_room(nearest_room)
 
-func activate_enemies(room:Area2D):
+func spawn_weapons(room:Area2D):
+	var rng=RandomNumberGenerator.new()
+	rng.randomize()
+	var weapon_count=rng.randi_range(1,4)
+	for x in range(0,weapon_count):
+		var weapon=all_weapons[rng.randi_range(0,all_weapons.size()-1)]
+		if weapon.get_parent():
+			add_child(weapon.duplicate())
+		else:
+			add_child(weapon)
+			
+		weapon.position=Vector2(room.position.x+75-x*50,room.position.y)
+
+func activate_room(room:Area2D):
 	for enemy in enemies.get(room):
 		enemy.see_player=true
+	_change_dors_mode(false,room.position)
+
+func room_sweeped(room:Area2D):
+	used_rooms[room]=true
+	spawn_weapons(room)
+	_change_dors_mode(true,room.position)
