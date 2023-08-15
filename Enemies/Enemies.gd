@@ -63,8 +63,9 @@ func _process(_delta):
 		if !navigation_agent.is_navigation_finished() and !atack:
 			$animation/atack_timer.stop()
 			if !damaged or $Damage_cooldown.time_left<=0.1:
-				move_and_slide()
-				in_motion=true
+				if navigation_agent.is_target_reachable():
+					move_and_slide()
+					in_motion=true
 		else:
 			in_motion=false
 			$animation/Timer.stop()
@@ -118,7 +119,7 @@ func Randomize_stats():
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
 	max_health=rng.randi_range(max_health-50,max_health+50)
-	speed=rng.randf_range(200-max_health*0.8,200-max_health*0.2)
+	speed=rng.randf_range(200-max_health*0.7,200-max_health*0.3)
 	damage=rng.randf_range(max_health*0.005,max_health*0.018)
-	atack_speed=rng.randf_range(damage*0.115,damage*0.145)
+	atack_speed=rng.randf_range(damage*0.12,damage*0.145)
 	scale*=max_health*0.01+0.2

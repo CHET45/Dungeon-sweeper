@@ -1,6 +1,6 @@
 extends "res://Levels/Dungeon_generation.gd"
 
-@onready var camera: Camera2D = $Camera2D
+@onready var camera: Camera2D=$Camera2D
 @onready var weapon_stock_obj=$CanvasLayer/Weapon_stock
 var change_weapon_flag=true
 var dor_mode_flag=false
@@ -17,8 +17,22 @@ func _ready():
 	weapon_stock_obj.visible=false
 	_setup_camera()
 	_generate()
+	if rendering_mode=="debug":
+		_fill_level(null)
 
 func _process(_delta):
+	if Input.is_action_just_pressed("c"):
+		camera.enabled=!camera.is_current()
+	if Input.is_action_just_pressed("1"):
+		rendering_mode="standart"
+	if Input.is_action_just_pressed("2"):
+		rendering_mode="fight"
+		call_deferred("_fill_level",null)
+	if Input.is_action_just_pressed("3"):
+		rendering_mode="debug"
+		call_deferred("_fill_level",null)
+	if rendering_mode=="standart":
+		call_deferred("_fill_level",null)
 	if Input.is_action_pressed("zoom+"):
 		camera.zoom +=Vector2(0.01,0.01) 
 	elif Input.is_action_pressed("zoom-") and camera.zoom>Vector2(0,0):
@@ -26,7 +40,7 @@ func _process(_delta):
 	if Input.is_action_just_pressed("re_generate"):
 		get_tree().reload_current_scene()
 	if Input.is_action_just_pressed("doors_updown"):
-		_change_dors_mode(dor_mode_flag,$Player.position)
+		_change_dors_mode(dor_mode_flag,null)
 		dor_mode_flag=!dor_mode_flag
 	if Input.is_action_just_pressed("Change_weapon") and change_weapon_flag:
 		weapon_stock_obj.visible=true
@@ -47,7 +61,7 @@ func _process(_delta):
 			child = weapon_list_obj.get_child(child_number)
 			child.emit_signal("weapon_button_pressed",child_number)
 func _setup_camera() :
-	camera.position = (level_size/2)*32
+	camera.position = level_size*16
 	camera.zoom = level_size/(level_size*7)
 
 func delete_weapon_from_scene(weapon_path):	
@@ -94,7 +108,7 @@ func weapon_button_pressed(_weapon_index):
 	pass
 
 
-func _on_creature_dead(creature:Node2D,room):
+func _on_creature_dead(creature:Node2D,room:Area2D):
 	enemies.get(room).erase(creature)
 	remove_child(creature)
 	creature.queue_free()
@@ -104,7 +118,7 @@ func _on_creature_dead(creature:Node2D,room):
 func _player_enters_room(body:Node2D):
 	if body.name=="Player":
 		var nearest_room= find_nearest_room(body.position)
-		if !used_rooms.has(nearest_room):
+		if !sweeped_rooms.has(nearest_room):
 			activate_room(nearest_room)
 
 func spawn_weapons(room:Area2D):
@@ -121,11 +135,17 @@ func spawn_weapons(room:Area2D):
 		weapon.position=Vector2(room.position.x+75-x*50,room.position.y)
 
 func activate_room(room:Area2D):
+	if rendering_mode!="debug":
+		rendering_mode="fight"
 	for enemy in enemies.get(room):
 		enemy.see_player=true
-	_change_dors_mode(false,room.position)
+	_fill_level(room)
+	_change_dors_mode(false,room)
+	
 
 func room_sweeped(room:Area2D):
-	used_rooms[room]=true
+	if rendering_mode!="debug":
+		rendering_mode="standart"
+	sweeped_rooms[room]=true
 	spawn_weapons(room)
-	_change_dors_mode(true,room.position)
+	_change_dors_mode(true,room)
