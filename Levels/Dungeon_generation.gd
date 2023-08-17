@@ -184,87 +184,30 @@ func _room_cells():
 				var point_count=1
 				while index<point_count:
 					point=corridor_cells[index]
-					if (data.get(point+Vector2(-1,0))==2 or
-						data.get(point+Vector2(-1,0))==3 or
-						data.get(point+Vector2(-1,0))==1 and 
-						!rooms.get(room).has(point+Vector2(-1,0)) ) and !corridor_cells.has(point+Vector2(-1,0)):
-							corridor_cells.push_back(point+Vector2(-1,0))
-							rooms.get(room).push_back(point+Vector2(-1,0))
-							point_count+=1
-					elif data.get(point+Vector2(-1,0))==0:
-						if !rooms.get(room).has(point+Vector2(-1,0)):
-							rooms.get(room).push_back(point+Vector2(-1,0))
-					if (data.get(point+Vector2(-1,-1))==2 or
-						data.get(point+Vector2(-1,-1))==3 or
-						data.get(point+Vector2(-1,-1))==1 and 
-						!rooms.get(room).has(point+Vector2(-1,-1)) ) and !corridor_cells.has(point+Vector2(-1,-1)):
-							corridor_cells.push_back(point+Vector2(-1,-1))
-							rooms.get(room).push_back(point+Vector2(-1,-1))
-							point_count+=1
-					elif data.get(point+Vector2(-1,-1))==3 or data.get(point+Vector2(-1,-1))==0:
-						if !rooms.get(room).has(point+Vector2(-1,-1)):
-							rooms.get(room).push_back(point+Vector2(-1,-1))
-					if (data.get(point+Vector2(0,-1))==2 or
-						data.get(point+Vector2(0,-1))==3 or
-						data.get(point+Vector2(0,-1))==1 and 
-						!rooms.get(room).has(point+Vector2(0,-1)) ) and !corridor_cells.has(point+Vector2(0,-1)):
-							corridor_cells.push_back(point+Vector2(0,-1))
-							rooms.get(room).push_back(point+Vector2(0,-1))
-							point_count+=1
-					elif data.get(point+Vector2(0,-1))==3 or data.get(point+Vector2(0,-1))==0:
-						if !rooms.get(room).has(point+Vector2(0,-1)):
-							rooms.get(room).push_back(point+Vector2(0,-1))
-					if (data.get(point+Vector2(1,-1))==2 or
-						data.get(point+Vector2(1,-1))==3 or
-						data.get(point+Vector2(1,-1))==1 and 
-						!rooms.get(room).has(point+Vector2(1,-1)) ) and !corridor_cells.has(point+Vector2(1,-1)):
-							corridor_cells.push_back(point+Vector2(1,-1))
-							rooms.get(room).push_back(point+Vector2(1,-1))
-							point_count+=1
-					elif data.get(point+Vector2(1,-1))==3 or data.get(point+Vector2(1,-1))==0:
-						if !rooms.get(room).has(point+Vector2(1,-1)):
-							rooms.get(room).push_back(point+Vector2(1,-1))
-					if (data.get(point+Vector2(1,0))==2 or
-						data.get(point+Vector2(1,0))==3 or
-						data.get(point+Vector2(1,0))==1 and 
-						!rooms.get(room).has(point+Vector2(1,0)) ) and !corridor_cells.has(point+Vector2(1,0)):
-							corridor_cells.push_back(point+Vector2(1,0))
-							rooms.get(room).push_back(point+Vector2(1,0))
-							point_count+=1
-					elif data.get(point+Vector2(1,0))==3 or data.get(point+Vector2(1,0))==0:
-						if !rooms.get(room).has(point+Vector2(1,0)):
-							rooms.get(room).push_back(point+Vector2(1,0))
-					if (data.get(point+Vector2(1,1))==2 or
-						data.get(point+Vector2(1,1))==3 or
-						data.get(point+Vector2(1,1))==1 and 
-						!rooms.get(room).has(point+Vector2(1,1)) ) and !corridor_cells.has(point+Vector2(1,1)):
-							corridor_cells.push_back(point+Vector2(1,1))
-							rooms.get(room).push_back(point+Vector2(1,1))
-							point_count+=1
-					elif data.get(point+Vector2(1,1))==3 or data.get(point+Vector2(1,1))==0:
-						if !rooms.get(room).has(point+Vector2(1,1)):
-							rooms.get(room).push_back(point+Vector2(1,1))
-					if (data.get(point+Vector2(0,1))==2 or
-						data.get(point+Vector2(0,1))==3 or
-						data.get(point+Vector2(0,1))==1 and 
-						!rooms.get(room).has(point+Vector2(0,1)) ) and !corridor_cells.has(point+Vector2(0,1)):
-							corridor_cells.push_back(point+Vector2(0,1))
-							rooms.get(room).push_back(point+Vector2(0,1))
-							point_count+=1
-					elif data.get(point+Vector2(0,1))==3 or data.get(point+Vector2(0,1))==0:
-						if !rooms.get(room).has(point+Vector2(0,1)):
-							rooms.get(room).push_back(point+Vector2(0,1))
-					if (data.get(point+Vector2(-1,1))==2 or
-						data.get(point+Vector2(-1,1))==3 or
-						data.get(point+Vector2(-1,1))==1 and 
-						!rooms.get(room).has(point+Vector2(-1,1)) ) and !corridor_cells.has(point+Vector2(-1,1)):
-							corridor_cells.push_back(point+Vector2(-1,1))
-							rooms.get(room).push_back(point+Vector2(-1,1))
-							point_count+=1
-					elif data.get(point+Vector2(-1,1))==3 or data.get(point+Vector2(-1,1))==0:
-						if !rooms.get(room).has(point+Vector2(-1,1)):
-							rooms.get(room).push_back(point+Vector2(-1,1))
+					for x in range(-1,2):
+						for y in range(-1,2):
+							if x==0 and y==0:
+								continue
+							else:
+								if (data.get(point)!=3 and (data.get(point+Vector2(x,y))==2 or
+									data.get(point+Vector2(x,y))==3 or
+									data.get(point+Vector2(x,y))==1 and 
+									!rooms.get(room).has(point+Vector2(x,y))) and
+									 !corridor_cells.has(point+Vector2(x,y))):
+										corridor_cells.push_back(point+Vector2(x,y))
+										rooms.get(room).push_back(point+Vector2(x,y))
+										point_count+=1
+								elif  (x==0 or y==0) and data.get(point+Vector2(x,y))==0:
+									if !rooms.get(room).has(point+Vector2(x,y)):
+										rooms.get(room).push_back(point+Vector2(x,y))
+								elif (data.get(point)==3 and data.get(point+Vector2(x,y))==3 and
+									 !corridor_cells.has(point+Vector2(x,y))):
+										corridor_cells.push_back(point+Vector2(x,y))
+										rooms.get(room).push_back(point+Vector2(x,y))
+										point_count+=1
 					index+=1
+		await  get_tree().physics_frame
+		print(".")
 	print("6")
 
 
