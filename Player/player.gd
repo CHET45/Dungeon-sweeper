@@ -1,6 +1,6 @@
 extends CharacterBody2D
 @export var speed:int
-@export var health:float
+@export var health:int
 @export var max_health:int
 signal health_change
 var in_motion=false
