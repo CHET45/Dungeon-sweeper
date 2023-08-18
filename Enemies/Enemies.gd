@@ -3,7 +3,7 @@ signal dead
 @export var speed: float
 @export var health:int
 @export var max_health:int
-@export var damage:float
+@export var damage:int
 @export var atack_speed:float
 @onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 var next_path_position: Vector2
@@ -121,6 +121,6 @@ func Randomize_stats():
 	rng.randomize()
 	max_health=rng.randi_range(max_health-50,max_health+50)
 	speed=rng.randf_range(200-max_health*0.7,200-max_health*0.3)
-	damage=rng.randf_range(max_health*0.005,max_health*0.018)
+	damage=rng.randi_range(1,4)
 	atack_speed=rng.randf_range(damage*0.12,damage*0.145)
 	scale*=max_health*0.01+0.2

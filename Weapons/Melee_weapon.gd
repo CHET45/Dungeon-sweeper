@@ -1,6 +1,6 @@
 extends Node2D
 @export var weapon_node:Node2D
-@export var damage:float
+@export var damage:int
 @export var atk_speed:float
 @export var weapon_path:String
 @export var animation:bool=false
@@ -28,5 +28,5 @@ func weapon_animation():
 func Random_stats_generator():
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
-	damage=rng.randf_range(damage-5,damage+5)
+	damage=rng.randi_range(damage-5,damage+5)
 	atk_speed=rng.randf_range(atk_speed-100,atk_speed+100)
