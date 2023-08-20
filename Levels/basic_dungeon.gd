@@ -21,6 +21,7 @@ func _ready():
 		_fill_level(null)
 
 func _process(_delta):
+	minimap.avatar_movement($Player.position)
 	if Input.is_action_just_pressed("c"):
 		camera.enabled=!camera.is_current()
 	if Input.is_action_just_pressed("1"):
@@ -139,6 +140,7 @@ func activate_room(room:Area2D):
 		rendering_mode="fight"
 	for enemy in enemies.get(room):
 		enemy.see_player=true
+	minimap.visible=false
 	_fill_level(room)
 	_change_dors_mode(false,room)
 	
@@ -146,6 +148,8 @@ func activate_room(room:Area2D):
 func room_sweeped(room:Area2D):
 	if rendering_mode!="debug":
 		rendering_mode="standart"
+	minimap.visible=true
 	sweeped_rooms[room]=true
+	minimap.sweeped_room(room)
 	spawn_weapons(room)
 	_change_dors_mode(true,room)

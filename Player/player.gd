@@ -16,7 +16,7 @@ signal add_weapon_to_weapon_stock
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	health=max_health
-	emit_signal("health_change",-((health-2)/2))
+	emit_signal("health_change",-(round(health-2)/2))
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	var input_direction = Input.get_vector("left", "right", "up", "down")
