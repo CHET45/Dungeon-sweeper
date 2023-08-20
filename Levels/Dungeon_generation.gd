@@ -10,8 +10,10 @@ var enemies={}
 var rooms={}
 var sweeped_rooms={}
 var dors=[]
-var rendering_mode="standart"
+var rooms_conections={}
+var rendering_mode=""
 @onready var level: TileMap = $Level
+@onready var minimap=$CanvasLayer/Minimap
 
 func _generate():
 	var regenerate=true
@@ -26,17 +28,23 @@ func _generate():
 		enemies={}
 		for room in rooms:
 			remove_child(room)
+		minimap.clear_level()
 		rooms = {}
 		sweeped_rooms={}
 		dors=[]
 		regenerate=_generate_data(rng)
-	_room_area_and_walls()
-	await get_tree().physics_frame
-	_add_connections(rng)
-	await get_tree().physics_frame
-	_add_dors()
-	await get_tree().physics_frame
-	_room_cells()
+		await get_tree().physics_frame
+	if !regenerate:
+		_room_area_and_walls()
+		await get_tree().physics_frame
+		_add_connections(rng)
+		await get_tree().physics_frame
+		_add_dors()
+		await get_tree().physics_frame
+		_room_cells()
+		await get_tree().physics_frame
+		_add_creatures(rng)
+		rendering_mode="standart"
 	
 func _fill_level(room:Area2D):
 	if rendering_mode=="standart":
@@ -83,7 +91,6 @@ func _generate_data(rng:RandomNumberGenerator):
 			rooms[room[0]]=room[1]
 			add_child(room[0])
 			room[0].body_entered.connect(_player_enters_room)
-			_add_creatures(rng,room[0])
 		elif tries_before_regeneration<=0 and data.size()>7000:
 			return true
 		elif tries_before_regeneration<=-30:
@@ -140,38 +147,55 @@ func _get_random_room(rng: RandomNumberGenerator) :
 
 func _room_area_and_walls():
 	for room in rooms:
+		var posx=room.position.x/32
+		var posy=room.position.y/32
 		if room.get_child(0).get_shape().get_class()=="CircleShape2D":
 			var radius=room.get_child(0).get_shape().get_radius()/32
-			room.get_child(0).get_shape().set_radius((radius-2.5)*32)
+			room.get_child(0).get_shape().set_radius((radius-4)*32)
+			for xi in range(-radius,radius+1):
+				var y=round(sqrt(-xi*xi+radius*radius))
+				for yi in range(-y,-y+3):
+					data.erase(Vector2(xi+posx,yi+posy))
+					rooms.get(room).erase(Vector2(xi+posx,yi+posy))
+				for yi in range(y-2,y+1):
+					data.erase(Vector2(xi+posx,yi+posy))
+					rooms.get(room).erase(Vector2(xi+posx,yi+posy))
+			for yi in range(-radius,radius+1):
+				var x=round(sqrt(-yi*yi+radius*radius))
+				for xi in range(-x,-x+3):
+					data.erase(Vector2(xi+posx,yi+posy))
+					rooms.get(room).erase(Vector2(xi+posx,yi+posy))
+				for xi in range(x-2,x+1):
+					data.erase(Vector2(xi+posx,yi+posy))
+					rooms.get(room).erase(Vector2(xi+posx,yi+posy))
 		elif room.get_child(0).get_shape().get_class()=="RectangleShape2D":
 			var width=room.get_child(0).get_shape().get_size().x/64
 			var height=room.get_child(0).get_shape().get_size().y/64
-			room.get_child(0).get_shape().set_size(Vector2(width-2,height-2)*64)
+			room.get_child(0).get_shape().set_size(Vector2(width-4,height-4)*64)
+			for w in 3:
+				for xi in range(posx-width, posx+width+1):
+					data[Vector2(xi,posy+height-w)]=null
+					data[Vector2(xi,posy-height+w)]=null
+					rooms.get(room).erase(Vector2(xi,posy+height-w))
+					rooms.get(room).erase(Vector2(xi,posy-height+w))
+				for yi in range(posy-height, posy+height+1):
+					data[Vector2(posx+width-w, yi)]=null
+					data[Vector2(posx-width+w, yi)]=null
+					rooms.get(room).erase(Vector2(posx+width-w, yi))
+					rooms.get(room).erase(Vector2(posx-width+w, yi))
+		room.position+=Vector2(16,16)
 		for point in rooms.get(room):
-			if !rooms.get(room).has(point+Vector2(-1,0)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(-1,-1)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(0,-1)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(1,-1)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(1,0)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(1,1)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(0,1)):
-				data[point]=0
-				continue
-			if !rooms.get(room).has(point+Vector2(-1,1)):
-				data[point]=0
-				continue
+			var next=false
+			for x in range(-1,2):
+				for y in range(-1,2):
+					if x==0 and y==0:
+						continue
+					else:
+						if !rooms.get(room).has(point+Vector2(x,y)):
+							data[point]=0
+							next=true
+							break
+				if next: break
 		
 	print("2")
 
@@ -374,20 +398,22 @@ func _change_dors_mode(Open:bool,room):
 				level.set_cell(1,point,0,Vector2(30,4))
 
 
-func _add_creatures(rng:RandomNumberGenerator, room:Area2D):
-	if $Player.position!=Vector2(0,0):
-		var room_monsters=[]
-		for en in rng.randi_range(1,2):
-			var child_enemy=get_node("Red_monster").duplicate()			
-			room_monsters.push_back(child_enemy)
-			add_child(child_enemy)
-			child_enemy.position=room.position+Vector2(rng.randi_range(-150,150),rng.randi_range(-150,150))
-			child_enemy.visible=true
-			child_enemy.room=room
-		enemies[room]=room_monsters
-	else:
-		sweeped_rooms[room]=true
-		$Player.position=room.position
+func _add_creatures(rng:RandomNumberGenerator):
+	for room in rooms:
+		if $Player.position!=Vector2(0,0):
+			var room_monsters=[]
+			for en in rng.randi_range(1,2):
+				var child_enemy=get_node("Red_monster").duplicate()
+				room_monsters.push_back(child_enemy)
+				add_child(child_enemy)
+				child_enemy.position=room.position+Vector2(rng.randi_range(-150,150),rng.randi_range(-150,150))
+				child_enemy.visible=true
+				child_enemy.room=room
+			enemies[room]=room_monsters
+		else:
+			sweeped_rooms[room]=true
+			$Player.position=room.position
+			minimap.sweeped_room(room)
 
 func _add_connections(rng: RandomNumberGenerator):
 	var used_rooms=[]
@@ -403,25 +429,27 @@ func _add_connections(rng: RandomNumberGenerator):
 		if nearest_room:
 			var room_center1 = room.position/32
 			var room_center2 = nearest_room.position/32
-			if !rng.randi_range(0, 1):
+			if rng.randi_range(0, 1):
 				_add_corridor(room_center1.x, room_center2.x, room_center1.y, Vector2.AXIS_X)#Exit horizontal
 				_add_corridor(room_center1.y, room_center2.y, room_center2.x, Vector2.AXIS_Y)#Enter vertical
+				minimap.add_rooms(room,nearest_room,1)
 			else:
 				_add_corridor(room_center1.y, room_center2.y, room_center1.x, Vector2.AXIS_Y)#Exit vertical
 				_add_corridor(room_center1.x, room_center2.x, room_center2.y, Vector2.AXIS_X)#Enter horizontal
+				minimap.add_rooms(room,nearest_room,0)
 	print("3")
 	_add_walls_for_corridors()
 	print("3.5")
 
 func _add_corridor( start: int, end: int, constant: int, axis: int) :
-	for cor_length in corridor_size+2:
-		for t in range(min(start, end), max(start, end) + cor_length+1):
+	for cor_length in range(-(corridor_size-1),corridor_size):
+		for t in range(min(start, end)-2, max(start, end)+cor_length+1):
 			var point = Vector2.ZERO
 			match axis:
 				Vector2.AXIS_X: point = Vector2(t, constant+cor_length)
 				Vector2.AXIS_Y: point = Vector2(constant+cor_length, t)
 			if data.get(point)!=1:
-				if cor_length>0 and cor_length<corridor_size+1:
+				if cor_length>-(corridor_size-1) and cor_length<corridor_size-1:
 					data[point] = 2
 				elif  data.get(point)==null:
 					data[point]=0
@@ -429,30 +457,17 @@ func _add_corridor( start: int, end: int, constant: int, axis: int) :
 func _add_walls_for_corridors():
 	for point in data:
 		if data.get(point)==2:
-			if data.get(point+Vector2(-1,0))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(-1,-1))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(0,-1))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(1,-1))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(1,0))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(1,1))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(0,1))==null:
-				data[point]=0
-				continue
-			if data.get(point+Vector2(-1,1))==null:
-				data[point]=0
-				continue
+			var next=false
+			for x in range(-1,2):
+						for y in range(-1,2):
+							if x==0 and y==0:
+								continue
+							else:
+								if data.get(point+Vector2(x,y))==null:
+									data[point]=0
+									next=true
+									break
+						if next:break
 
 func _player_enters_room(_body:Node2D):
 	pass

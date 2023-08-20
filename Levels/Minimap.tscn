@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://criyf103jjv2e"]
+
+[ext_resource type="Script" path="res://Levels/Minimap.gd" id="1_14ol8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aubhq"]
+bg_color = Color(0.341176, 0.341176, 0.0823529, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Gradient" id="Gradient_lv1n2"]
+offsets = PackedFloat32Array(0.922581)
+colors = PackedColorArray(0.38171, 1, 0.42155, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_p4acs"]
+gradient = SubResource("Gradient_lv1n2")
+
+[node name="Minimap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_14ol8")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_aubhq")
+
+[node name="Marker" type="Sprite2D" parent="."]
+z_index = 2
+position = Vector2(1152, 648)
+scale = Vector2(0.02, 0.02)
+texture = SubResource("GradientTexture2D_p4acs")
+region_rect = Rect2(3.56, 2.295, 1.81, 3.395)
+
+[node name="Line2D" type="Line2D" parent="."]
+default_color = Color(0.254902, 0.160784, 0, 1)
