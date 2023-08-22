@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://bd62bito1jy2a"]
+[gd_scene load_steps=9 format=3 uid="uid://bd62bito1jy2a"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_5ktv0"]
 [ext_resource type="Texture2D" uid="uid://wk58j1projls" path="res://Tiles/Man_animation.tres" id="2_kx4pk"]
 [ext_resource type="Script" path="res://Player/Man_anmation.gd" id="3_6035o"]
+[ext_resource type="Texture2D" uid="uid://do36sgwkibeaa" path="res://Tiles/Light.jpg" id="4_ne06n"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5fqnq"]
 size = Vector2(20, 30)
@@ -94,6 +95,22 @@ position = Vector2(9, 5)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 editor_draw_screen = false
+
+[node name="Global_light" type="PointLight2D" parent="."]
+color = Color(0.788235, 0.482353, 0.0352941, 1)
+energy = 0.4
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("4_ne06n")
+texture_scale = 4.0
+
+[node name="Player_light" type="PointLight2D" parent="."]
+position = Vector2(1, 10)
+energy = 0.1
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("4_ne06n")
+texture_scale = 0.5
 
 [connection signal="timeout" from="Man/Timer" to="Man" method="Man_animation"]
 [connection signal="timeout" from="Damage_cooldown" to="." method="damage_cooldown_timeout"]

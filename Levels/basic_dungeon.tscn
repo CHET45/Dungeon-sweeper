@@ -51,29 +51,6 @@ offset_bottom = 150.0
 grow_horizontal = 0
 grow_vertical = 1
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer"]
-visible = false
-top_level = true
-custom_minimum_size = Vector2(200, 200)
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -235.0
-offset_top = 28.0
-offset_right = -35.0
-offset_bottom = 228.0
-grow_horizontal = 0
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer"]
-handle_input_locally = false
-gui_disable_input = true
-gui_embed_subwindows = true
-sdf_oversize = 0
-sdf_scale = 0
-size = Vector2i(200, 200)
-render_target_update_mode = 0
-
 [node name="HP_bar" parent="CanvasLayer" instance=ExtResource("3_hw6d3")]
 anchors_preset = 0
 anchor_right = 0.0
@@ -132,6 +109,10 @@ position = Vector2(33, -180)
 [node name="Regen" parent="." instance=ExtResource("9_jw3th")]
 position = Vector2(617, 390)
 HP_regen = 14
+
+[node name="Shadows" type="CanvasModulate" parent="."]
+rotation = -0.145008
+color = Color(0.67451, 0.709804, 0.709804, 1)
 
 [connection signal="button_down" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" method="_on_button_down"]
 [connection signal="weapon_button_pressed" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="Player" method="weapon_button_pressed"]
