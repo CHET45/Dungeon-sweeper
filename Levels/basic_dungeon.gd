@@ -2,6 +2,9 @@ extends "res://Levels/Dungeon_generation.gd"
 
 @onready var camera: Camera2D=$Camera2D
 @onready var weapon_stock_obj=$CanvasLayer/Weapon_stock
+@onready var LoadingProgress=$CanvasLayer/Loading_screen/LoadingBar
+@onready var LoadingState=$CanvasLayer/Loading_screen/LoadingState
+@onready var Stats=$CanvasLayer/Weapon_stock/Weapon_list/Container/Button/Stats
 var change_weapon_flag=true
 var dor_mode_flag=false
 var first=true
@@ -10,7 +13,9 @@ var child
 var child_number
 var all_weapons=[]
 
+
 func _ready():
+	LoadingProgress.max_value=generation_states.size()-1
 	all_weapons=get_tree().get_nodes_in_group("weapons")
 	weapon_list_obj=weapon_stock_obj.get_node("Weapon_list/Container")
 	$CanvasLayer.visible=true
@@ -21,17 +26,18 @@ func _ready():
 		_fill_level(null)
 
 func _process(_delta):
-	minimap.avatar_movement($Player.position)
-	if Input.is_action_just_pressed("c"):
-		camera.enabled=!camera.is_current()
-	if Input.is_action_just_pressed("1"):
-		rendering_mode="standart"
-	if Input.is_action_just_pressed("2"):
-		rendering_mode="fight"
-		call_deferred("_fill_level",null)
-	if Input.is_action_just_pressed("3"):
-		rendering_mode="debug"
-		call_deferred("_fill_level",null)
+	load_map(generation_progress)
+	if generation_progress=="done":
+		LoadingProgress.get_parent().hide()
+		minimap.avatar_movement($Player.position)
+		if Input.is_action_just_pressed("c"):
+			camera.enabled=!camera.enabled
+		if Input.is_action_just_pressed("1"):
+			rendering_mode="standart"
+			call_deferred("_fill_level",null)
+		if Input.is_action_just_pressed("3"):
+			rendering_mode="debug"
+			call_deferred("_fill_level",null)
 	if rendering_mode=="standart":
 		call_deferred("_fill_level",null)
 	if Input.is_action_pressed("zoom+"):
@@ -40,9 +46,9 @@ func _process(_delta):
 		camera.zoom-=Vector2(0.01,0.01) 
 	if Input.is_action_just_pressed("re_generate"):
 		get_tree().reload_current_scene()
-	if Input.is_action_just_pressed("doors_updown"):
-		_change_dors_mode(dor_mode_flag,null)
-		dor_mode_flag=!dor_mode_flag
+	#if Input.is_action_just_pressed("doors_updown"):
+	#	_change_dors_mode(dor_mode_flag,null)
+	#	dor_mode_flag=!dor_mode_flag
 	if Input.is_action_just_pressed("Change_weapon") and change_weapon_flag:
 		weapon_stock_obj.visible=true
 		change_weapon_flag=false
@@ -62,15 +68,16 @@ func _process(_delta):
 			child = weapon_list_obj.get_child(child_number)
 			child.emit_signal("weapon_button_pressed",child_number)
 func _setup_camera() :
-	camera.position = level_size*16
-	camera.zoom = level_size/(level_size*7)
+	if level_size:
+		camera.position = level_size*16
+		camera.zoom = level_size/(level_size*7)
 
 func delete_weapon_from_scene(weapon_path):	
 	await get_tree().physics_frame
 	remove_child(get_node(weapon_path))
 
 
-func add_weapon_to_weapon_stock(weapon_texture):
+func add_weapon_to_weapon_stock(weapon_texture,damage,atack_speed):
 	var wep_Button=weapon_list_obj.get_child(weapon_list_obj.get_child_count()-1)
 	if first:
 		first=false
@@ -82,14 +89,17 @@ func add_weapon_to_weapon_stock(weapon_texture):
 		for n in wep_Button.get_children():
 			wep_Button.remove_child(n)
 			n.queue_free()
-	wep_Button.add_child(weapon_texture.duplicate())
-	var weapon_sprite=wep_Button.get_child(0)
+	var weapon_sprite=weapon_texture.duplicate()
+	var weapon_stats=Stats.duplicate()
+	wep_Button.add_child(weapon_stats)
+	wep_Button.add_child(weapon_sprite)
 	weapon_sprite.centered=true
 	weapon_sprite.offset*=0
 	weapon_sprite.position.y=wep_Button.size.y/2
 	weapon_sprite.position.x=63
 	weapon_sprite.rotate(-1.5708)
-	weapon_sprite.scale*=2
+	weapon_sprite.scale*=1.5	
+	weapon_stats.text="a.s.:	"+var_to_str(atack_speed)+"\nd.:	"+var_to_str(damage)
 	
 	child_number=weapon_list_obj.get_child_count()-1
 	child = weapon_list_obj.get_child(child_number)
@@ -100,13 +110,8 @@ func shoot(bullet):
 	add_child(bullet)
 
 
-func weapon_button_pressed(_weapon_index):
-	#chtobi menjalos pri nazatii na knopku
-	#child_number=weapon_index
-	pass
-	#chtobi menjalos pri nazatii na knopku
-	#child_number=weapon_index
-	pass
+func weapon_button_pressed(weapon_index):
+	child_number=weapon_index
 
 
 func _on_creature_dead(creature:Node2D,room:Area2D):
@@ -114,7 +119,7 @@ func _on_creature_dead(creature:Node2D,room:Area2D):
 	remove_child(creature)
 	creature.queue_free()
 	if enemies.get(room).size()<=0:
-		room_sweeped(room)
+		room_sweeped(room,false)
 
 func _player_enters_room(body:Node2D):
 	if body.name=="Player":
@@ -122,10 +127,14 @@ func _player_enters_room(body:Node2D):
 		if !sweeped_rooms.has(nearest_room):
 			activate_room(nearest_room)
 
-func spawn_weapons(room:Area2D):
+func spawn_weapons(room:Area2D,first_room:bool):
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
-	var weapon_count=rng.randi_range(1,4)
+	var weapon_count
+	if first_room:
+		weapon_count=rng.randi_range(3,6)
+	else:
+		weapon_count=rng.randi_range(1,4)
 	for x in range(0,weapon_count):
 		var weapon=all_weapons[rng.randi_range(0,all_weapons.size()-1)]
 		if weapon.get_parent():
@@ -143,13 +152,20 @@ func activate_room(room:Area2D):
 	minimap.visible=false
 	_fill_level(room)
 	_change_dors_mode(false,room)
-	
 
-func room_sweeped(room:Area2D):
+func room_sweeped(room:Area2D, first_room:bool):
 	if rendering_mode!="debug":
 		rendering_mode="standart"
 	minimap.visible=true
 	sweeped_rooms[room]=true
 	minimap.sweeped_room(room)
-	spawn_weapons(room)
+	spawn_weapons(room,first_room)
 	_change_dors_mode(true,room)
+
+func load_map(state):
+	LoadingProgress.value=generation_states.find(state)
+	LoadingState.text=state
+
+
+func change_weapon_by_button(number):
+	child_number=number

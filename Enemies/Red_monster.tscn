@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cglkt5fttl6id"]
+[gd_scene load_steps=6 format=3 uid="uid://cglkt5fttl6id"]
 
 [ext_resource type="Texture2D" uid="uid://ctj3808fx5tc" path="res://Tiles/Red_monstr_animation.tres" id="1_0w0l3"]
 [ext_resource type="PackedScene" uid="uid://kioyo7ql75rd" path="res://Enemies/Enemy.tscn" id="1_4jpx8"]
@@ -9,14 +9,6 @@
 custom_solver_bias = 1.0
 radius = 31.0
 height = 62.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uwtu1"]
-radius = 64.0
-height = 128.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34slc"]
-radius = 37.0
-height = 74.0
 
 [node name="Red_monster" instance=ExtResource("1_4jpx8")]
 collision_layer = 132
@@ -34,10 +26,8 @@ script = ExtResource("2_rywsx")
 position = Vector2(0, -24)
 shape = SubResource("CapsuleShape2D_vwjnl")
 
-[node name="CollisionShape2D" parent="Release_damage" index="0"]
-position = Vector2(0, -15)
-rotation = 1.5708
-shape = SubResource("CapsuleShape2D_uwtu1")
+[node name="CollisionPolygon2D" parent="Release_damage" index="0"]
+polygon = PackedVector2Array(45, 2, 46, -53, -8, -61, -17, -33, -19, -4, 24, -1)
 
 [node name="HP" parent="." index="3"]
 offset_left = -21.0
@@ -48,9 +38,8 @@ offset_bottom = -51.0
 [node name="Damage_cooldown" parent="." index="4"]
 wait_time = 0.4
 
-[node name="CollisionShape2D" parent="Take_damage" index="0"]
-position = Vector2(1, -24)
-shape = SubResource("CapsuleShape2D_34slc")
+[node name="CollisionPolygon2D" parent="Take_damage" index="0"]
+polygon = PackedVector2Array(19, -2, -1, 18, -36, 8, -38, -51, -15, -54, 23, -42)
 
 [node name="NavigationAgent2D" parent="." index="6"]
 path_postprocessing = 1
