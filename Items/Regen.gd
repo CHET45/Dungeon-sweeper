@@ -6,12 +6,11 @@ var player
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	$Regen_view.text=var_to_str(HP_regen)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	$Regen_view.text=var_to_str(HP_regen)
 	if animation:
 		if Input.is_action_just_pressed("use"):
 			if player.health<player.max_health:

@@ -12,11 +12,14 @@ var sweeped_rooms={}
 var dors=[]
 var rooms_conections={}
 var rendering_mode=""
+var generation_states=["rooms", "walls", "corridors", "dors", "battle_area", "creatures","done"]
+var generation_progress
 @onready var level: TileMap = $Level
 @onready var minimap=$CanvasLayer/Minimap
 
 func _generate():
 	var regenerate=true
+	generation_progress=generation_states[0]
 	var rng = RandomNumberGenerator.new()
 	while regenerate:
 		for room in enemies:
@@ -34,17 +37,13 @@ func _generate():
 		dors=[]
 		regenerate=_generate_data(rng)
 		await get_tree().physics_frame
-	if !regenerate:
-		_room_area_and_walls()
-		await get_tree().physics_frame
-		_add_connections(rng)
-		await get_tree().physics_frame
-		_add_dors()
-		await get_tree().physics_frame
-		_room_cells()
-		await get_tree().physics_frame
-		_add_creatures(rng)
-		rendering_mode="standart"
+	await _room_area_and_walls()
+	await _add_connections(rng)
+	await _add_dors()
+	await _room_cells()
+	await _add_creatures(rng)
+	generation_progress=generation_states[6]
+	rendering_mode="standart"
 	
 func _fill_level(room:Area2D):
 	if rendering_mode=="standart":
@@ -146,6 +145,7 @@ func _get_random_room(rng: RandomNumberGenerator) :
 	return r
 
 func _room_area_and_walls():
+	generation_progress=generation_states[1]
 	for room in rooms:
 		var posx=room.position.x/32
 		var posy=room.position.y/32
@@ -200,6 +200,7 @@ func _room_area_and_walls():
 	print("2")
 
 func _room_cells():
+	generation_progress=generation_states[4]
 	for room in rooms:
 		for point in rooms.get(room):
 			if data.get(point)==1:
@@ -236,6 +237,7 @@ func _room_cells():
 
 
 func _add_dors():
+	generation_progress=generation_states[3]
 	var all_dors={}
 	_add_all_dors(all_dors)
 	print("4")
@@ -399,6 +401,7 @@ func _change_dors_mode(Open:bool,room):
 
 
 func _add_creatures(rng:RandomNumberGenerator):
+	generation_progress=generation_states[5]
 	for room in rooms:
 		if $Player.position!=Vector2(0,0):
 			var room_monsters=[]
@@ -411,11 +414,12 @@ func _add_creatures(rng:RandomNumberGenerator):
 				child_enemy.room=room
 			enemies[room]=room_monsters
 		else:
-			sweeped_rooms[room]=true
+			room_sweeped(room, true)
 			$Player.position=room.position
 			minimap.sweeped_room(room)
 
 func _add_connections(rng: RandomNumberGenerator):
+	generation_progress=generation_states[2]
 	var used_rooms=[]
 	for room in rooms:
 		if !used_rooms.has(room):
@@ -470,6 +474,8 @@ func _add_walls_for_corridors():
 						if next:break
 
 func _player_enters_room(_body:Node2D):
+	pass
+func room_sweeped(_room:Area2D, _first_room:bool):
 	pass
 func find_nearest_room(player):
 	for room in rooms:

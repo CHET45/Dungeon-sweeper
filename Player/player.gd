@@ -46,8 +46,11 @@ func _process(_delta):
 		weapon.position=$Weapon_place.position
 	
 func simple_motion_animation():
-	if Input.is_action_pressed("down") or Input.is_action_pressed("up") or Input.is_action_pressed("left") or Input.is_action_pressed("right"):
-		in_motion=true
+	if (Input.is_action_pressed("down") or 
+		Input.is_action_pressed("up") or 
+		Input.is_action_pressed("left") or 
+		Input.is_action_pressed("right")):
+			in_motion=true
 	else:
 		in_motion=false
 		$Man/Timer.stop()
@@ -84,8 +87,7 @@ func Player_entered_deferred(weapon_instance,weapon_texture):
 	add_child(weapon_instance)
 	weapons[weapon_count]=weapon_instance
 	weapon=weapon_instance
-	print("weapon added to player")
-	emit_signal("add_weapon_to_weapon_stock",weapon_texture)
+	emit_signal("add_weapon_to_weapon_stock",weapon_texture,weapon.damage,weapon.atk_speed)
 	weapon.flip=$Man.flip_h
 	weapon.position=$Weapon_place.position
 	

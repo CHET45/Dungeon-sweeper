@@ -2,21 +2,19 @@ extends "res://Weapons/Melee_weapon.gd"
 var rotation_direction=1
 var animation_part=1
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	#weapon_node=get_node(".")
+
+func set_weapon_path():
 	weapon_path=get_path()
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func weapon_atack_animation(delta):
 	$Weapon_sprite.flip_v=flip
 	$Weapon_area.position.x=-$Weapon_sprite.offset.y
 	if animation:
 		if animation_part==1:
 			animation_part=2
 			atk_speed=-atk_speed/4
-		rotation_degrees+=atk_speed*rotation_direction*delta
+		rotation_degrees+=atk_speed*rotation_direction*delta*10
 	if flip:
 		$Weapon_sprite.offset.y=4
 		rotation_direction=-1

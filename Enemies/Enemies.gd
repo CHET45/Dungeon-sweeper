@@ -57,11 +57,11 @@ func _process(_delta):
 			new_velocity = new_velocity * speed
 		
 			velocity = new_velocity
-			if velocity.x<0:
-				$animation.flip_h=true
-			elif velocity.x>0:
-				$animation.flip_h=false
 			if !atack:
+				if velocity.x<0:
+					$animation.flip_h=true
+				elif velocity.x>0:
+					$animation.flip_h=false
 				$animation/atack_timer.stop()
 				if !damaged or $Damage_cooldown.time_left<=0.1:
 					if navigation_agent.is_target_reachable():

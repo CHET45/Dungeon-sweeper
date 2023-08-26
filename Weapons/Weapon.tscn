@@ -1,11 +1,30 @@
-[gd_scene load_steps=2 format=3 uid="uid://rb3oe7cs2jwx"]
+[gd_scene load_steps=3 format=3 uid="uid://rb3oe7cs2jwx"]
 
 [ext_resource type="Script" path="res://Weapons/Melee_weapon.gd" id="1_8dbp3"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_loyou"]
+line_spacing = 1.0
+font_size = 10
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
 
 [node name="Weapon" type="Node2D" groups=["weapons"]]
 script = ExtResource("1_8dbp3")
 
 [node name="Weapon_sprite" type="Sprite2D" parent="."]
+
+[node name="Stats" type="Label" parent="."]
+z_index = 2
+layout_direction = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -14.0
+offset_right = 1.0
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_loyou")
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Weapon_area" type="Area2D" parent="."]
 collision_layer = 0
