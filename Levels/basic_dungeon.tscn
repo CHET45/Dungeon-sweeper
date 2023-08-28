@@ -1,8 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://cdyghw15niw36"]
+[gd_scene load_steps=11 format=3 uid="uid://cdyghw15niw36"]
 
 [ext_resource type="Script" path="res://Levels/basic_dungeon.gd" id="1_65xyv"]
 [ext_resource type="TileSet" uid="uid://bns40f1vo75ri" path="res://Tiles/Tile_set_all.tres" id="2_riet7"]
-[ext_resource type="PackedScene" uid="uid://criyf103jjv2e" path="res://Levels/Minimap.tscn" id="3_f0t8c"]
 [ext_resource type="PackedScene" uid="uid://bqvd8oornsh3j" path="res://Player/HP_bar.tscn" id="3_hw6d3"]
 [ext_resource type="Script" path="res://Levels/Weapon_Button.gd" id="4_l2nhg"]
 [ext_resource type="PackedScene" uid="uid://bd62bito1jy2a" path="res://Player/Player.tscn" id="5_4vr7m"]
@@ -20,16 +19,6 @@ border_width_bottom = 2
 border_color = Color(0, 0, 0, 1)
 shadow_color = Color(0.337255, 0.254902, 0.239216, 0.6)
 shadow_size = 27
-
-[sub_resource type="LabelSettings" id="LabelSettings_lfs3o"]
-line_spacing = 16.0
-font_size = 8
-font_color = Color(1, 0, 0, 1)
-outline_size = 3
-outline_color = Color(0, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6enu8"]
-bg_color = Color(0.576471, 0.635294, 0.352941, 1)
 
 [node name="BasicDungeon" type="Node2D"]
 script = ExtResource("1_65xyv")
@@ -53,21 +42,27 @@ enabled = false
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="Minimap" parent="CanvasLayer" instance=ExtResource("3_f0t8c")]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(200, 200)
 anchors_preset = 1
 anchor_left = 1.0
-anchor_bottom = 0.0
-offset_left = -150.0
-offset_bottom = 150.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_bottom = 200.0
 grow_horizontal = 0
-grow_vertical = 1
+
+[node name="SubViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(200, 200)
+render_target_update_mode = 0
 
 [node name="HP_bar" parent="CanvasLayer" instance=ExtResource("3_hw6d3")]
 anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
-offset_right = 534.0
-offset_bottom = 31.0
+offset_right = 1152.0
+offset_bottom = 648.0
 grow_horizontal = 1
 grow_vertical = 1
 
@@ -95,67 +90,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Button" type="Button" parent="CanvasLayer/Weapon_stock/Weapon_list/Container"]
+visible = false
 custom_minimum_size = Vector2(0, 40)
 layout_direction = 1
 layout_mode = 2
 icon_alignment = 1
 script = ExtResource("4_l2nhg")
 
-[node name="Stats" type="Label" parent="CanvasLayer/Weapon_stock/Weapon_list/Container/Button"]
-layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -33.0
-offset_top = -8.0
-offset_right = -4.0
-offset_bottom = 8.0
-grow_horizontal = 0
-grow_vertical = 2
-label_settings = SubResource("LabelSettings_lfs3o")
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="Loading_screen" type="Panel" parent="CanvasLayer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_6enu8")
-
-[node name="LoadingBar" type="ProgressBar" parent="CanvasLayer/Loading_screen"]
-custom_minimum_size = Vector2(500, 0)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -2.0
-offset_top = -13.5
-offset_right = 2.0
-offset_bottom = 13.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="LoadingState" type="Label" parent="CanvasLayer/Loading_screen"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -37.0
-offset_top = -39.095
-offset_right = 37.0
-offset_bottom = -13.095
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Player" parent="." instance=ExtResource("5_4vr7m")]
+position = Vector2(-223, -172)
 
 [node name="Sword" parent="." instance=ExtResource("6_7s8fc")]
-position = Vector2(25, -172)
+position = Vector2(-234, -175)
 
 [node name="Red_monster" parent="." groups=["Enemies"] instance=ExtResource("7_461yd")]
 visible = false
@@ -164,28 +110,19 @@ scale = Vector2(0.5, 0.5)
 disable_mode = 0
 
 [node name="Axe" parent="." instance=ExtResource("8_oxcd8")]
-position = Vector2(33, -180)
-
-[node name="Player" parent="." instance=ExtResource("5_4vr7m")]
-z_index = 1
-position = Vector2(34, -178)
+position = Vector2(-228, -175)
 
 [node name="Regen" parent="." instance=ExtResource("9_jw3th")]
 position = Vector2(617, 390)
 HP_regen = 14
 
-[node name="Shadows" type="CanvasModulate" parent="."]
-rotation = -0.145008
-color = Color(0.67451, 0.709804, 0.709804, 1)
-
-[connection signal="pressed" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" method="_on_button_down"]
-[connection signal="weapon_button_pressed" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="." method="weapon_button_pressed"]
+[connection signal="button_down" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" method="_on_button_down"]
 [connection signal="weapon_button_pressed" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="Player" method="weapon_button_pressed"]
+[connection signal="add_weapon_to_weapon_stock" from="Player" to="." method="add_weapon_to_weapon_stock"]
+[connection signal="health_change" from="Player" to="CanvasLayer/HP_bar" method="player_health_change"]
 [connection signal="Player_entered" from="Sword" to="Player" method="Player_entered"]
 [connection signal="delete_weapon_from_scene" from="Sword" to="." method="delete_weapon_from_scene"]
 [connection signal="dead" from="Red_monster" to="." method="_on_creature_dead"]
 [connection signal="hit_player" from="Red_monster" to="Player" method="Take_damage"]
 [connection signal="Player_entered" from="Axe" to="Player" method="Player_entered"]
 [connection signal="delete_weapon_from_scene" from="Axe" to="." method="delete_weapon_from_scene"]
-[connection signal="add_weapon_to_weapon_stock" from="Player" to="." method="add_weapon_to_weapon_stock"]
-[connection signal="health_change" from="Player" to="CanvasLayer/HP_bar" method="player_health_change"]
