@@ -1,8 +1,11 @@
 extends CharacterBody2D
 @export var speed:int
-@export var health:float
+@export var health:int
 @export var max_health:int
 signal health_change
+signal dead
+var second_life=false
+var second_life_animation=1
 var in_motion=false
 var motion_flag=true
 var damaged=false
@@ -11,44 +14,94 @@ var weapon:Node2D
 var weapons={}
 var weapon_count=-1
 @export var can_flip_h=true
+var room:Area2D
 
 signal add_weapon_to_weapon_stock
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	health=max_health
-	emit_signal("health_change",-((health-2)/2))
+	emit_signal("health_change",-(round(health-2)/2))
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	velocity.y=Input.get_action_strength("down")-Input.get_action_strength("up")
-	velocity.x=Input.get_action_strength("right")-Input.get_action_strength("left")
-	velocity*=speed*delta*100
-	if can_flip_h:
-		if velocity.x<0 :
-			if $Man.flip_h==false:
-				$Weapon_place.position.x=-$Weapon_place.position.x
-			$Man.flip_h=true
-		elif velocity.x>0:
-			if $Man.flip_h==true:
-				$Weapon_place.position.x=-$Weapon_place.position.x
-			$Man.flip_h=false
-	if $Damage_cooldown.time_left<=0.45 or !damaged :
-		move_and_slide()
-		simple_motion_animation()
-			
-	if Input.is_action_just_pressed("Atack") and weapon and weapon.animation==false:
-		weapon.call("weapon_animation")
-		#if weapon.has_method("shoort"):
-		#	weapon.call("shoort")
-		can_flip_h=false
-	elif	weapon and weapon.animation==false:
-		can_flip_h=true
-	if weapon :
-		weapon.flip=$Man.flip_h
-		weapon.position=$Weapon_place.position
+func _process(_delta):
+	if health>0:
+		var input_direction = Input.get_vector("left", "right", "up", "down")
+		velocity=input_direction*speed
+		if can_flip_h:
+			if velocity.x<0 :
+				if $Man.flip_h==false:
+					$Weapon_place.position.x=-$Weapon_place.position.x
+				$Man.flip_h=true
+			elif velocity.x>0:
+				if $Man.flip_h==true:
+					$Weapon_place.position.x=-$Weapon_place.position.x
+				$Man.flip_h=false
+		if $Damage_cooldown.time_left<=0.45 or !damaged :
+			move_and_slide()
+			simple_motion_animation()
+				
+		if Input.is_action_just_pressed("Atack") and weapon and weapon.animation==false:
+			weapon.call("weapon_animation")
+			#if weapon.has_method("shoort"):
+			#	weapon.call("shoort")
+			can_flip_h=false
+		elif	weapon and weapon.animation==false:
+			can_flip_h=true
+		if weapon :
+			weapon.flip=$Man.flip_h
+			weapon.position=$Weapon_place.position
+	elif !second_life and second_life_animation>=1:
+			if rotation_degrees>=0 and second_life_animation==1:
+				rotation_degrees=-90
+				damaged=true
+				if weapon:
+					weapon.hide()
+				$CollisionShape2D.disabled=true
+				#$Second_life/Shape.disabled=false
+				second_life_animation=2
+			elif rotation_degrees<=0 and second_life_animation==2:
+				rotation_degrees+=1
+				$Player_light.energy+=0.11
+				#$Second_life/Shape.shape.radius+=5
+				$Player_light.texture_scale+=0.01
+			if rotation_degrees>=-45 and second_life_animation==2 and rotation_degrees<0:
+				rotation_degrees+=1
+				$Player_light.energy+=0.21
+				#$Second_life/Shape.shape.radius+=5
+				$Player_light.texture_scale+=0.05
+			if rotation_degrees>=0 and second_life_animation==2:
+				$Player_light.energy=0.1
+				$Player_light.texture_scale=0.5
+				#$Second_life/Shape.shape.radius=1
+				#$Second_life/Shape.disabled=true
+				second_life_animation=-1
+				rotation_degrees=0
+				damaged=false
+	elif !second_life and second_life_animation==-1:
+		var mouse_pos=get_global_mouse_position()
+		$Man.global_position=mouse_pos
+		if room.position.distance_squared_to(mouse_pos)<200000:
+			$Man.set_modulate(Color("ffffff"))
+			if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+				$Man.position*=0
+				position=mouse_pos
+				@warning_ignore("integer_division")
+				Restore_hp(round(max_health*1.5))
+				second_life=true
+				await get_tree().physics_frame
+				$CollisionShape2D.disabled=false
+				if weapon:
+					weapon.visible=true
+		else:
+			$Man.set_modulate(Color("67676781"))
+	else:
+		emit_signal("dead", get_node("."),null)
 	
 func simple_motion_animation():
-	if Input.is_action_pressed("down") or Input.is_action_pressed("up") or Input.is_action_pressed("left") or Input.is_action_pressed("right"):
-		in_motion=true
+	if (Input.is_action_pressed("down") or 
+		Input.is_action_pressed("up") or 
+		Input.is_action_pressed("left") or 
+		Input.is_action_pressed("right")):
+			in_motion=true
 	else:
 		in_motion=false
 		$Man/Timer.stop()
@@ -85,8 +138,7 @@ func Player_entered_deferred(weapon_instance,weapon_texture):
 	add_child(weapon_instance)
 	weapons[weapon_count]=weapon_instance
 	weapon=weapon_instance
-	print("weapon added to player")
-	emit_signal("add_weapon_to_weapon_stock",weapon_texture)
+	emit_signal("add_weapon_to_weapon_stock",weapon_texture,weapon.damage,weapon.atk_speed)
 	weapon.flip=$Man.flip_h
 	weapon.position=$Weapon_place.position
 	
@@ -101,7 +153,7 @@ func Restore_hp(HP):
 		emit_signal("health_change",-HP)
 	elif health+HP>=max_health:		
 		emit_signal("health_change",-(max_health-health))
-		health=max_health
+		health+=max_health
 
 func has_weapon(new_weapon:Node2D):
 	return weapons.has(new_weapon)

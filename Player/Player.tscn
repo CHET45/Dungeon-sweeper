@@ -1,11 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://bd62bito1jy2a"]
+[gd_scene load_steps=10 format=3 uid="uid://bd62bito1jy2a"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_5ktv0"]
 [ext_resource type="Texture2D" uid="uid://wk58j1projls" path="res://Tiles/Man_animation.tres" id="2_kx4pk"]
 [ext_resource type="Script" path="res://Player/Man_anmation.gd" id="3_6035o"]
+[ext_resource type="Texture2D" uid="uid://do36sgwkibeaa" path="res://Tiles/Light.jpg" id="4_ne06n"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5fqnq"]
-size = Vector2(20, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_df2xg"]
+radius = 14.0357
 
 [sub_resource type="Animation" id="Animation_p2b3o"]
 resource_name = "Damaged"
@@ -56,14 +57,16 @@ _data = {
 "RESET": SubResource("Animation_oaooh")
 }
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_86p0h"]
+radius = 5.0
+
 [node name="Player" type="CharacterBody2D"]
 light_mask = 2
 visibility_layer = 61
 collision_layer = 514
 collision_mask = 121
 script = ExtResource("1_5ktv0")
-speed = 150
-max_health = 10
+speed = 200
 
 [node name="Man" type="Sprite2D" parent="."]
 texture = ExtResource("2_kx4pk")
@@ -78,7 +81,7 @@ wait_time = 0.1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 2
-shape = SubResource("RectangleShape2D_5fqnq")
+shape = SubResource("CircleShape2D_df2xg")
 metadata/_edit_lock_ = true
 
 [node name="Damage_cooldown" type="Timer" parent="."]
@@ -93,6 +96,34 @@ libraries = {
 position = Vector2(9, 5)
 
 [node name="Camera2D" type="Camera2D" parent="."]
+editor_draw_screen = false
+
+[node name="Global_light" type="PointLight2D" parent="."]
+color = Color(0.788235, 0.482353, 0.0352941, 1)
+energy = 0.4
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("4_ne06n")
+texture_scale = 4.0
+
+[node name="Player_light" type="PointLight2D" parent="."]
+position = Vector2(1, 10)
+rotation = -1.04562
+energy = 0.1
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 1)
+shadow_filter = 2
+texture = ExtResource("4_ne06n")
+texture_scale = 0.5
+
+[node name="Second_life" type="RigidBody2D" parent="."]
+collision_layer = 128
+collision_mask = 128
+freeze = true
+
+[node name="Shape" type="CollisionShape2D" parent="Second_life"]
+shape = SubResource("CircleShape2D_86p0h")
+disabled = true
 
 [connection signal="timeout" from="Man/Timer" to="Man" method="Man_animation"]
 [connection signal="timeout" from="Damage_cooldown" to="." method="damage_cooldown_timeout"]

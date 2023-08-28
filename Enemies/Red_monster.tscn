@@ -4,23 +4,16 @@
 [ext_resource type="PackedScene" uid="uid://kioyo7ql75rd" path="res://Enemies/Enemy.tscn" id="1_4jpx8"]
 [ext_resource type="Script" path="res://Enemies/Red_monster.gd" id="2_4khk4"]
 [ext_resource type="Script" path="res://Enemies/RedMonsterAnimation.gd" id="2_rywsx"]
+[ext_resource type="Texture2D" uid="uid://do36sgwkibeaa" path="res://Tiles/Light.jpg" id="5_g6h62"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_vwjnl"]
-custom_solver_bias = 1.0
-radius = 17.0
-height = 58.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_j3olr"]
+radius = 18.0
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uwtu1"]
-radius = 27.0
-height = 88.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34slc"]
-radius = 25.0
-height = 74.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_iyfy1"]
 
 [node name="Red_monster" instance=ExtResource("1_4jpx8")]
 collision_layer = 132
-collision_mask = 188
+collision_mask = 189
 script = ExtResource("2_4khk4")
 max_health = 100
 
@@ -32,12 +25,10 @@ script = ExtResource("2_rywsx")
 
 [node name="Cillision_for_everything" parent="." index="1"]
 position = Vector2(0, -24)
-shape = SubResource("CapsuleShape2D_vwjnl")
+shape = SubResource("CircleShape2D_j3olr")
 
-[node name="CollisionShape2D" parent="Release_damage" index="0"]
-position = Vector2(1, -24)
-rotation = 1.5708
-shape = SubResource("CapsuleShape2D_uwtu1")
+[node name="CollisionPolygon2D" parent="Release_damage" index="0"]
+polygon = PackedVector2Array(45, 2, 46, -53, -8, -61, -17, -33, -19, -4, 24, -1)
 
 [node name="HP" parent="." index="3"]
 offset_left = -21.0
@@ -48,16 +39,34 @@ offset_bottom = -51.0
 [node name="Damage_cooldown" parent="." index="4"]
 wait_time = 0.4
 
-[node name="CollisionShape2D" parent="Take_damage" index="0"]
-position = Vector2(1, -24)
-shape = SubResource("CapsuleShape2D_34slc")
+[node name="CollisionPolygon2D" parent="Take_damage" index="0"]
+polygon = PackedVector2Array(19, -2, -1, 18, -36, 8, -38, -51, -15, -54, 23, -42)
 
 [node name="NavigationAgent2D" parent="." index="6"]
 path_postprocessing = 1
-debug_enabled = true
+
+[node name="Angry_boom" type="Timer" parent="." index="7"]
+wait_time = 5.0
+
+[node name="Angry_boom_light" type="PointLight2D" parent="." index="8"]
+color = Color(0.780392, 0, 0, 1)
+energy = 0.0
+shadow_enabled = true
+shadow_filter = 2
+texture = ExtResource("5_g6h62")
+texture_scale = 0.01
+
+[node name="Angry_boom_damage" type="Area2D" parent="." index="9"]
+collision_layer = 4
+collision_mask = 2
+
+[node name="shape" type="CollisionShape2D" parent="Angry_boom_damage" index="0"]
+shape = SubResource("CircleShape2D_iyfy1")
 
 [connection signal="timeout" from="animation/Timer" to="animation" method="enemy_animation"]
 [connection signal="timeout" from="animation/atack_timer" to="animation" method="enemy_atack_animation"]
 [connection signal="body_entered" from="Release_damage" to="." method="body_entered"]
 [connection signal="body_exited" from="Release_damage" to="." method="body_exited"]
 [connection signal="area_entered" from="Take_damage" to="." method="weapon_entered"]
+[connection signal="timeout" from="Angry_boom" to="." method="_on_angry_boom_timeout"]
+[connection signal="body_entered" from="Angry_boom_damage" to="." method="_on_angry_boom_damage_body_entered"]

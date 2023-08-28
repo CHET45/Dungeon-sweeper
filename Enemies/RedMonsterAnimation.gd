@@ -24,6 +24,6 @@ func enemy_atack_animation():
 		get_parent().atack=false
 		get_parent().atack_flag=true
 		frame_pos=0
-	if frame_pos>2:
+	if frame_pos>3:
 		get_parent().damage_the_player()
 	$atack_timer.start()

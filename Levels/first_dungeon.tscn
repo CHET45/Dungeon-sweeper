@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://bryvgqtacla0g"]
+
+[ext_resource type="PackedScene" uid="uid://cdyghw15niw36" path="res://Levels/basic_dungeon.tscn" id="1_nfsev"]
+[ext_resource type="Script" path="res://FirstDungeon.gd" id="2_md2ax"]
+
+[node name="FirstDungeon" instance=ExtResource("1_nfsev")]
+script = ExtResource("2_md2ax")
+
+[node name="Red_monster" parent="." index="4"]
+scale = Vector2(1, 1)
+
+[node name="Player" parent="." index="6"]
+max_health = 10
+
+[connection signal="weapon_button_pressed" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="." method="weapon_button_pressed" flags=18]
+[connection signal="weapon_button_pressed" from="CanvasLayer/Weapon_stock/Weapon_list/Container/Button" to="Player" method="weapon_button_pressed" flags=18]
+[connection signal="Player_entered" from="Sword" to="Player" method="Player_entered" flags=18]
+[connection signal="delete_weapon_from_scene" from="Sword" to="." method="delete_weapon_from_scene" flags=18]
+[connection signal="dead" from="Red_monster" to="." method="_on_creature_dead"]
+[connection signal="hit_player" from="Red_monster" to="Player" method="Take_damage"]
+[connection signal="Player_entered" from="Axe" to="Player" method="Player_entered" flags=18]
+[connection signal="delete_weapon_from_scene" from="Axe" to="." method="delete_weapon_from_scene" flags=18]
+[connection signal="add_weapon_to_weapon_stock" from="Player" to="." method="add_weapon_to_weapon_stock" flags=18]
+[connection signal="dead" from="Player" to="." method="_on_creature_dead"]
+[connection signal="health_change" from="Player" to="CanvasLayer/HP_bar" method="player_health_change"]
