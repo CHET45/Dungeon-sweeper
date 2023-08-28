@@ -5,15 +5,12 @@ var sc=0.003
 var player
 
 # Called when the node enters the scene tree for the first time.
-func _ready():	
-	var rng=RandomNumberGenerator.new()
-	rng.randomize()
-	HP_regen=rng.randi_range(1,10)
+func _ready():
+	$Regen_view.text=var_to_str(HP_regen)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	$Regen_view.text=var_to_str(HP_regen)
 	if animation:
 		if Input.is_action_just_pressed("use"):
 			if player.health<player.max_health:
