@@ -23,7 +23,7 @@ wait_time = 0.14
 collision_layer = 4
 collision_mask = 59
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Release_damage"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Release_damage"]
 
 [node name="HP" type="ProgressBar" parent="."]
 offset_left = -40.0
@@ -38,7 +38,7 @@ show_percentage = false
 collision_layer = 4
 collision_mask = 64
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Take_damage"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Take_damage"]
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 
