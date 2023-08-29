@@ -169,7 +169,6 @@ position = Vector2(33, -180)
 [node name="Player" parent="." instance=ExtResource("5_4vr7m")]
 z_index = 1
 position = Vector2(34, -178)
-max_health = 0
 
 [node name="Regen" parent="." instance=ExtResource("9_jw3th")]
 position = Vector2(617, 390)
