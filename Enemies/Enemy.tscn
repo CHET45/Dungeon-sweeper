@@ -17,7 +17,7 @@ wait_time = 0.14
 
 [node name="atack_timer" type="Timer" parent="animation"]
 
-[node name="Cillision_for_everything" type="CollisionShape2D" parent="."]
+[node name="Collision_for_everything" type="CollisionShape2D" parent="."]
 
 [node name="Release_damage" type="Area2D" parent="."]
 collision_layer = 4
