@@ -113,6 +113,9 @@ func Damage_animation():
 	else:
 		RGB_flag=true
 
+func set_default_stats():
+	pass
+
 func Randomize_stats():
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
