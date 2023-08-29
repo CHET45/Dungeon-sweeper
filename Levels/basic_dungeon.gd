@@ -5,6 +5,7 @@ extends "res://Levels/Dungeon_generation.gd"
 @onready var LoadingProgress=$CanvasLayer/Loading_screen/LoadingBar
 @onready var LoadingState=$CanvasLayer/Loading_screen/LoadingState
 @onready var Stats=$CanvasLayer/Weapon_stock/Weapon_list/Container/Button/Stats
+@onready var regen_botle=$Regen
 var change_weapon_flag=true
 var dor_mode_flag=false
 var first=true
@@ -13,10 +14,9 @@ var child
 var child_number
 var all_weapons=[]
 var weapons_in_room=[]
-
+var rng=RandomNumberGenerator.new()
 
 func _ready():
-	LoadingProgress.max_value=generation_states.size()-1
 	all_weapons=get_tree().get_nodes_in_group("weapons")
 	weapon_list_obj=weapon_stock_obj.get_node("Weapon_list/Container")
 	$CanvasLayer.visible=true
@@ -27,7 +27,7 @@ func _ready():
 		_fill_level(null)
 
 func _process(_delta):
-	load_map(generation_progress)
+	load_map(generation_progress,state_progress)
 	if generation_progress=="done":
 		LoadingProgress.get_parent().hide()
 		minimap.avatar_movement($Player.position)
@@ -116,6 +116,11 @@ func weapon_button_pressed(weapon_index):
 
 
 func _on_creature_dead(creature:Node2D,room:Area2D):
+	if rng.randi_range(1,4)>2:
+		if regen_botle.get_parent():
+			regen_botle=regen_botle.duplicate()
+		add_child(regen_botle)
+		regen_botle.position=creature.position
 	if room:
 		enemies.get(room).erase(creature)
 		remove_child(creature)
@@ -132,7 +137,6 @@ func _player_enters_room(body:Node2D):
 			activate_room(nearest_room)
 
 func spawn_weapons(room:Area2D,first_room:bool):
-	var rng=RandomNumberGenerator.new()
 	rng.randomize()
 	var weapon_count
 	if first_room:
@@ -142,7 +146,9 @@ func spawn_weapons(room:Area2D,first_room:bool):
 	for x in range(0,weapon_count):
 		var weapon=all_weapons[rng.randi_range(0,all_weapons.size()-1)]
 		if weapon.get_parent():
-			weapon=weapon.duplicate()
+			var new_weapon=weapon.duplicate()
+			new_weapon.set_default_stats()
+			weapon=new_weapon
 		add_child(weapon)
 		weapons_in_room.push_back(weapon)
 			
@@ -168,8 +174,8 @@ func room_sweeped(room:Area2D, first_room:bool):
 	spawn_weapons(room,first_room)
 	_change_dors_mode(true,room)
 
-func load_map(state):
-	LoadingProgress.value=generation_states.find(state)
+func load_map(state,progress):
+	LoadingProgress.value=progress
 	LoadingState.text=state
 
 
