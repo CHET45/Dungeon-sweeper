@@ -85,8 +85,9 @@ func _process(_delta):
 				$Man.position*=0
 				position=mouse_pos
 				@warning_ignore("integer_division")
-				Restore_hp(round(max_health*1.5))
+				Restore_hp(max_health)
 				second_life=true
+				Take_damage(0)
 				await get_tree().physics_frame
 				$CollisionShape2D.disabled=false
 				if weapon:
@@ -148,12 +149,12 @@ func weapon_button_pressed(weapon_index):
 	weapon.visible=true
 
 func Restore_hp(HP):
-	if health+HP<max_health:
+	if health+HP<=max_health:
 		health+=HP
 		emit_signal("health_change",-HP)
-	elif health+HP>=max_health:		
+	elif health+HP>max_health:
 		emit_signal("health_change",-(max_health-health))
-		health+=max_health
+		health=max_health
 
 func has_weapon(new_weapon:Node2D):
 	return weapons.has(new_weapon)

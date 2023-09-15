@@ -6,7 +6,6 @@ extends Node2D
 @export var animation:bool=false
 @export var flip:bool
 var show_stats=false
-var sc=0.003
 var player
 signal Player_entered
 signal delete_weapon_from_scene
@@ -25,11 +24,6 @@ func _process(delta):
 			emit_signal("delete_weapon_from_scene",weapon_path)
 		$Weapon_sprite.scale=Vector2(1.3,1.3)
 		$Stats.visible=true
-		$Stats.scale+=Vector2(sc,sc)
-		if $Stats.scale.x>=1.1:
-			sc=-sc
-		if $Stats.scale.x<=0.9:
-			sc=-sc
 	else:
 		$Stats.hide()
 		$Stats.scale=Vector2(1,1)
@@ -48,9 +42,16 @@ func weapon_animation():
 	animation=true
 	$Weapon_area.set_collision_layer_value(7,true)
 
+func mouse_entered():
+	show_stats=true
+func mouse_exited():
+	show_stats=false
+
 func weapon_atack_animation(_delta):
 	pass
 func set_weapon_path():
+	pass
+func set_default_stats():
 	pass
 func Random_stats_generator():
 	var rng=RandomNumberGenerator.new()

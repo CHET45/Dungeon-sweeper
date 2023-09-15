@@ -9,12 +9,13 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_5awof"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_iyfy1"]
+radius = 13.3417
 
 [node name="Red_monster" instance=ExtResource("1_4jpx8")]
 collision_layer = 132
 collision_mask = 189
 script = ExtResource("2_4khk4")
-max_health = 100
+max_health = 90
 
 [node name="animation" parent="." index="0"]
 scale = Vector2(0.5, 0.5)
@@ -44,10 +45,7 @@ polygon = PackedVector2Array(19, -2, -1, 18, -36, 8, -38, -51, -15, -54, 23, -42
 [node name="NavigationAgent2D" parent="." index="6"]
 path_postprocessing = 1
 
-[node name="Angry_boom_timer" type="Timer" parent="." index="7"]
-wait_time = 5.0
-
-[node name="Angry_boom_light" type="PointLight2D" parent="." index="8"]
+[node name="Angry_boom_light" type="PointLight2D" parent="." index="7"]
 position = Vector2(0, -24)
 color = Color(0.780392, 0, 0, 1)
 energy = 0.0
@@ -56,12 +54,16 @@ shadow_filter = 2
 texture = ExtResource("5_g6h62")
 texture_scale = 0.01
 
-[node name="Angry_boom_damage" type="Area2D" parent="." index="9"]
+[node name="Angry_boom_damage" type="Area2D" parent="." index="8"]
 position = Vector2(0, -24)
 collision_layer = 4
-collision_mask = 2
+collision_mask = 6
+gravity_point = true
+gravity_point_unit_distance = 1024.0
+gravity = 4096.0
 
 [node name="shape" type="CollisionShape2D" parent="Angry_boom_damage" index="0"]
+position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_iyfy1")
 
 [connection signal="timeout" from="animation/Timer" to="animation" method="enemy_animation"]
@@ -69,5 +71,4 @@ shape = SubResource("CircleShape2D_iyfy1")
 [connection signal="body_entered" from="Release_damage" to="." method="body_entered"]
 [connection signal="body_exited" from="Release_damage" to="." method="body_exited"]
 [connection signal="area_entered" from="Take_damage" to="." method="weapon_entered"]
-[connection signal="timeout" from="Angry_boom_timer" to="." method="_on_angry_boom_timeout"]
 [connection signal="body_entered" from="Angry_boom_damage" to="." method="_on_angry_boom_damage_body_entered"]

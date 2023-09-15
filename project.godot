@@ -11,12 +11,14 @@ config_version=5
 [application]
 
 config/name="06 2023"
+run/main_scene="res://Levels/first_dungeon.tscn"
 config/features=PackedStringArray("4.1", "Mobile")
-boot_splash/image="res://Tiles/Dor_tile.png"
+boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [display]
 
+window/size/initial_position_type=2
 window/stretch/mode="viewport"
 window/stretch/aspect="keep_width"
 
@@ -143,8 +145,12 @@ c={
 
 [rendering]
 
-textures/canvas_textures/default_texture_filter=2
+textures/canvas_textures/default_texture_filter=0
 textures/canvas_textures/default_texture_repeat=1
+textures/lossless_compression/force_png=true
+textures/default_filters/use_nearest_mipmap_filter=true
+textures/decals/filter=0
+textures/light_projectors/filter=0
 environment/glow/upscale_mode=0
 environment/defaults/default_clear_color=Color(0, 0, 0, 1)
 anti_aliasing/quality/msaa_2d=3

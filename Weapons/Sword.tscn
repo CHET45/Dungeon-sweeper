@@ -33,3 +33,5 @@ shape = SubResource("RectangleShape2D_rcncq")
 
 [connection signal="body_entered" from="Weapon_area" to="." method="body_entered" flags=18]
 [connection signal="body_exited" from="Weapon_area" to="." method="body_exited" flags=18]
+[connection signal="mouse_entered" from="Weapon_area" to="." method="mouse_entered"]
+[connection signal="mouse_exited" from="Weapon_area" to="." method="mouse_exited"]
