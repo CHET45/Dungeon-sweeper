@@ -12,19 +12,27 @@ region = Rect2(384, 46, 42, 18)
 size = Vector2(16, 20)
 
 [node name="Axe" node_paths=PackedStringArray("weapon_node") instance=ExtResource("1_e8rjw")]
+position = Vector2(234, 162)
 script = ExtResource("2_pgc8t")
 weapon_node = NodePath(".")
 damage = 15
 atk_speed = 9.0
+animation = true
 
 [node name="Weapon_sprite" parent="." index="0"]
 rotation = 1.5708
 texture = SubResource("AtlasTexture_y805u")
 offset = Vector2(-10, -4)
+metadata/_edit_lock_ = true
+
+[node name="Weapon_area" parent="." index="2"]
+position = Vector2(4, -20)
+metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" parent="Weapon_area" index="0"]
-position = Vector2(4, -17)
 shape = SubResource("RectangleShape2D_6jgw4")
 
 [connection signal="body_entered" from="Weapon_area" to="." method="body_entered" flags=18]
 [connection signal="body_exited" from="Weapon_area" to="." method="body_exited" flags=18]
+[connection signal="mouse_entered" from="Weapon_area" to="." method="mouse_entered"]
+[connection signal="mouse_exited" from="Weapon_area" to="." method="mouse_exited"]

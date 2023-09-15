@@ -35,3 +35,6 @@ func weapon_atack_animation(delta):
 		$Weapon_sprite.position.y+=15
 		$Weapon_area.position.y+=15
 		animation_part=1
+func set_default_stats():
+	damage=10
+	atk_speed=11
