@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bd62bito1jy2a"]
+[gd_scene load_steps=9 format=3 uid="uid://bd62bito1jy2a"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_5ktv0"]
 [ext_resource type="Texture2D" uid="uid://wk58j1projls" path="res://Tiles/Man_animation.tres" id="2_kx4pk"]
@@ -57,9 +57,6 @@ _data = {
 "RESET": SubResource("Animation_oaooh")
 }
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_86p0h"]
-radius = 5.0
-
 [node name="Player" type="CharacterBody2D"]
 light_mask = 2
 visibility_layer = 61
@@ -115,15 +112,6 @@ shadow_color = Color(0, 0, 0, 1)
 shadow_filter = 2
 texture = ExtResource("4_ne06n")
 texture_scale = 0.5
-
-[node name="Second_life" type="RigidBody2D" parent="."]
-collision_layer = 128
-collision_mask = 128
-freeze = true
-
-[node name="Shape" type="CollisionShape2D" parent="Second_life"]
-shape = SubResource("CircleShape2D_86p0h")
-disabled = true
 
 [connection signal="timeout" from="Man/Timer" to="Man" method="Man_animation"]
 [connection signal="timeout" from="Damage_cooldown" to="." method="damage_cooldown_timeout"]

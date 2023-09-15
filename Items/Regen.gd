@@ -40,3 +40,9 @@ func _on_area_2d_body_entered(body):
 func _on_area_2d_body_exited(body):
 	if body.name=="Player":
 		animation=false
+
+
+func _on_area_2d_mouse_entered():
+	animation=true
+func _on_area_2d_mouse_exited():	
+	animation=false

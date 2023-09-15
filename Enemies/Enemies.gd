@@ -53,10 +53,7 @@ func process(_delta):
 		
 			velocity = new_velocity
 			if !atack:
-				if velocity.x<0:
-					$animation.flip_h=true
-				elif velocity.x>0:
-					$animation.flip_h=false
+				flip_enemy(velocity.x)
 				$animation/atack_timer.stop()
 				if (!damaged or $Damage_cooldown.time_left<=0.1) and !damage_player:
 					if navigation_agent.is_target_reachable():
@@ -71,10 +68,17 @@ func process(_delta):
 			if in_motion and motion_flag:
 				motion_flag=false
 				$animation.enemy_animation()
-		
+		else:
+			in_motion=false
+			$animation/Timer.stop()
+			motion_flag=true
 	else:
 		emit_signal("dead",get_node("."),room)
-
+func flip_enemy(direction):
+	if direction<0:
+		$animation.flip_h=true
+	elif direction>0:
+		$animation.flip_h=false
 func body_entered(body):
 	if body.name=="Player":
 		if atack_flag:
@@ -113,13 +117,19 @@ func Damage_animation():
 	else:
 		RGB_flag=true
 
+func Restore_hp(HP):
+	if HP+health<=max_health:
+		health+=HP
+	elif HP+health>max_health:
+		health=max_health
+
 func set_default_stats():
 	pass
 
 func Randomize_stats():
 	var rng=RandomNumberGenerator.new()
 	rng.randomize()
-	max_health=rng.randi_range(max_health-50,max_health+50)
+	max_health=rng.randi_range(max_health-50,max_health+30)
 	speed=rng.randf_range(200-max_health*0.7,200-max_health*0.3)
 	damage=rng.randi_range(1,4)
 	atack_speed=rng.randf_range(damage*0.12,damage*0.145)
